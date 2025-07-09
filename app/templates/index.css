@@ -1,166 +1,256 @@
  /* 全局样式重置 */
-* {
-    margin: 0; /* 清除所有元素默认外边距 */
-    padding: 0; /* 清除所有元素默认内边距 */
-    box-sizing: border-box; /* 盒模型设置为border-box，确保内边距和边框不增加元素总宽度 */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* 全局字体设置 */
-}
+ * {
+     margin: 0;
+     /* 清除所有元素默认外边距 */
+     padding: 0;
+     /* 清除所有元素默认内边距 */
+     box-sizing: border-box;
+     /* 盒模型设置为border-box，确保内边距和边框不增加元素总宽度 */
+     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+     /* 全局字体设置 */
+ }
 
 
-/* 页面主体样式 */
-body {
-    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c); /* 背景使用渐变色 */
-    min-height: 100vh; /* 最小高度为视口高度，确保页面占满屏幕 */
-    display: flex; /* 使用flex布局 */
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
-    padding: 20px; /* 页面内边距 */
-}
+ /* 页面主体样式 */
+ body {
+     background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+     /* 背景使用渐变色 */
+     min-height: 100vh;
+     /* 最小高度为视口高度，确保页面占满屏幕 */
+     display: flex;
+     /* 使用flex布局 */
+     justify-content: center;
+     /* 水平居中 */
+     align-items: center;
+     /* 垂直居中 */
+     padding: 20px;
+     /* 页面内边距 */
+ }
 
 
 
-/* 应用主容器 */
-.app-container {
-    width: 100%; /* 宽度占满父容器 */
-    max-width: 1200px; /* 最大宽度限制，防止在大屏幕上过宽 */
-    height: 90vh; /* 高度为视口的90% */
-    background: rgba(255, 255, 255, 0.95); /* 半透明白色背景 */
-    border-radius: 20px; /* 圆角边框 */
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25); /* 添加阴影效果 */
-    overflow: hidden; /* 隐藏溢出内容 */
-    display: flex; /* 使用flex布局 */
-    animation: fadeIn 0.8s ease; /* 应用淡入动画 */
-}
+ /* 应用主容器 */
+ .app-container {
+     width: 100%;
+     /* 宽度占满父容器 */
+     max-width: 1200px;
+     /* 最大宽度限制，防止在大屏幕上过宽 */
+     height: 90vh;
+     /* 高度为视口的90% */
+     background: rgba(255, 255, 255, 0.95);
+     /* 半透明白色背景 */
+     border-radius: 20px;
+     /* 圆角边框 */
+     box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+     /* 添加阴影效果 */
+     overflow: hidden;
+     /* 隐藏溢出内容 */
+     display: flex;
+     /* 使用flex布局 */
+     animation: fadeIn 0.8s ease;
+     /* 应用淡入动画 */
+ }
 
-/* 定义淡入动画 */
-@keyframes fadeIn {
-    from {
-        opacity: 0; /* 初始透明度为0（完全透明） */
-        transform: translateY(20px); /* 初始位置向下偏移20px */
-    }
-    to {
-        opacity: 1; /* 结束时完全不透明 */
-        transform: translateY(0); /* 回到正常位置 */
-    }
-}
+ /* 定义淡入动画 */
+ @keyframes fadeIn {
+     from {
+         opacity: 0;
+         /* 初始透明度为0（完全透明） */
+         transform: translateY(20px);
+         /* 初始位置向下偏移20px */
+     }
+
+     to {
+         opacity: 1;
+         /* 结束时完全不透明 */
+         transform: translateY(0);
+         /* 回到正常位置 */
+     }
+ }
 
  /* 侧边栏样式 */
-.sidebar {
-    width: 250px; /* 侧边栏默认宽度 */
-    background: linear-gradient(to bottom, #3a7bd5, #00d2ff); /* 侧边栏背景渐变 */
-    color: white; /* 文字颜色为白色 */
-    padding: 25px 0; /* 上下内边距25px，左右0 */
-    display: flex; /* 使用flex布局 */
-    flex-direction: column; /* 垂直排列子元素 */
-    height: 100%; /* 高度占满父容器 */
-    position: relative; /* 相对定位，用于子元素绝对定位 */
-    transition: width 0.1s ease; /* 宽度变化时的过渡动画 */
-}
+ .sidebar {
+     width: 250px;
+     /* 侧边栏默认宽度 */
+     background: linear-gradient(to bottom, #3a7bd5, #00d2ff);
+     /* 侧边栏背景渐变 */
+     color: white;
+     /* 文字颜色为白色 */
+     padding: 25px 0;
+     /* 上下内边距25px，左右0 */
+     display: flex;
+     /* 使用flex布局 */
+     flex-direction: column;
+     /* 垂直排列子元素 */
+     height: 100%;
+     /* 高度占满父容器 */
+     position: relative;
+     /* 相对定位，用于子元素绝对定位 */
+     transition: width 0.1s ease;
+     /* 宽度变化时的过渡动画 */
+ }
 
-/* 用户信息区域样式 */
-.user-info {
-    text-align: center; /* 文本居中 */
-    padding: 0 20px 25px; /* 左右内边距20px，底部25px */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* 底部边框（半透明） */
-    margin-bottom: 20px; /* 底部外边距20px */
-    cursor: pointer; /* 鼠标悬停时显示指针 */
-    transition: all 0.3s; /* 所有属性变化的过渡动画 */
-    position: relative; /* 相对定位，用于子菜单定位 */
-}
+ /* 用户信息区域样式 */
+ .user-info {
+     text-align: center;
+     /* 文本居中 */
+     padding: 0 20px 25px;
+     /* 左右内边距20px，底部25px */
+     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+     /* 底部边框（半透明） */
+     margin-bottom: 20px;
+     /* 底部外边距20px */
+     cursor: pointer;
+     /* 鼠标悬停时显示指针 */
+     transition: all 0.3s;
+     /* 所有属性变化的过渡动画 */
+     position: relative;
+     /* 相对定位，用于子菜单定位 */
+ }
 
-/* 用户信息区域悬停效果 */
-.user-info:hover {
-    background: rgba(255, 255, 255, 0.1); /* 背景半透明白色 */
-    border-radius: 15px; /* 圆角 */
-    margin: 0 10px 20px; /* 调整外边距，形成内边距效果 */
-}
+ /* 用户信息区域悬停效果 */
+ .user-info:hover {
+     background: rgba(255, 255, 255, 0.1);
+     /* 背景半透明白色 */
+     border-radius: 15px;
+     /* 圆角 */
+     margin: 0 10px 20px;
+     /* 调整外边距，形成内边距效果 */
+ }
 
-/* 用户头像样式 */
-.user-avatar {
-    width: 100px; /* 宽度100px */
-    height: 100px; /* 高度100px */
-    border-radius: 50%; /* 圆形头像 */
-    object-fit: cover; /* 图片自适应裁剪 */
-    border: 3px solid white; /* 白色边框 */
-    margin: 0 auto 15px; /* 水平居中，底部外边距15px */
-    background: linear-gradient(45deg, #ff7e5f, #feb47b); /* 头像背景渐变 */
-    display: flex; /* flex布局 */
-    align-items: center; /* 垂直居中 */
-    justify-content: center; /* 水平居中 */
-    font-size: 40px; /* 图标大小 */
-    color: white; /* 图标颜色 */
-    transition: all 0.3s; /* 所有属性过渡动画 */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* 阴影效果 */
-}
+ /* 用户头像样式 */
+ .user-avatar {
+     width: 100px;
+     /* 宽度100px */
+     height: 100px;
+     /* 高度100px */
+     border-radius: 50%;
+     /* 圆形头像 */
+     object-fit: cover;
+     /* 图片自适应裁剪 */
+     border: 3px solid white;
+     /* 白色边框 */
+     margin: 0 auto 15px;
+     /* 水平居中，底部外边距15px */
+     background: linear-gradient(45deg, #ff7e5f, #feb47b);
+     /* 头像背景渐变 */
+     display: flex;
+     /* flex布局 */
+     align-items: center;
+     /* 垂直居中 */
+     justify-content: center;
+     /* 水平居中 */
+     font-size: 40px;
+     /* 图标大小 */
+     color: white;
+     /* 图标颜色 */
+     transition: all 0.3s;
+     /* 所有属性过渡动画 */
+     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+     /* 阴影效果 */
+ }
 
-/* 头像悬停效果（继承自user-info的hover） */
-.user-info:hover .user-avatar {
-    transform: scale(1.05); /* 放大1.05倍 */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* 增强阴影 */
-}
+ /* 头像悬停效果（继承自user-info的hover） */
+ .user-info:hover .user-avatar {
+     transform: scale(1.05);
+     /* 放大1.05倍 */
+     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+     /* 增强阴影 */
+ }
 
-/* 用户名样式 */
-.user-name {
-    font-size: 22px; /* 字体大小 */
-    font-weight: 600; /* 字体粗细 */
-    margin-bottom: 5px; /* 底部外边距 */
-    letter-spacing: 0.5px; /* 字间距 */
-}
+ /* 用户名样式 */
+ .user-name {
+     font-size: 22px;
+     /* 字体大小 */
+     font-weight: 600;
+     /* 字体粗细 */
+     margin-bottom: 5px;
+     /* 底部外边距 */
+     letter-spacing: 0.5px;
+     /* 字间距 */
+ }
 
-/* 用户角色样式 */
-.user-role {
-    font-size: 15px; /* 字体大小 */
-    opacity: 0.9; /* 透明度 */
-    background: rgba(255, 255, 255, 0.2); /* 半透明白色背景 */
-    display: inline-block; /* 行内块元素 */
-    padding: 3px 12px; /* 内边距 */
-    border-radius: 15px; /* 圆角 */
-    margin-top: 5px; /* 顶部外边距 */
-}
+ /* 用户角色样式 */
+ .user-role {
+     font-size: 15px;
+     /* 字体大小 */
+     opacity: 0.9;
+     /* 透明度 */
+     background: rgba(255, 255, 255, 0.2);
+     /* 半透明白色背景 */
+     display: inline-block;
+     /* 行内块元素 */
+     padding: 3px 12px;
+     /* 内边距 */
+     border-radius: 15px;
+     /* 圆角 */
+     margin-top: 5px;
+     /* 顶部外边距 */
+ }
 
-/* 导航菜单容器 */
-.nav-menu {
-    flex: 1; /* 占据剩余空间 */
-    padding: 0 15px; /* 左右内边距15px */
-}
+ /* 导航菜单容器 */
+ .nav-menu {
+     flex: 1;
+     /* 占据剩余空间 */
+     padding: 0 15px;
+     /* 左右内边距15px */
+ }
 
-/* 导航项样式 */
-.nav-item {
-    display: flex; /* flex布局 */
-    align-items: center; /* 垂直居中 */
-    padding: 16px 20px; /* 内边距 */
-    border-radius: 12px; /* 圆角 */
-    margin-bottom: 8px; /* 底部外边距 */
-    cursor: pointer; /* 鼠标指针 */
-    transition: all 0.3s; /* 过渡动画 */
-    background: rgba(255, 255, 255, 0.1); /* 半透明背景 */
-}
+ /* 导航项样式 */
+ .nav-item {
+     display: flex;
+     /* flex布局 */
+     align-items: center;
+     /* 垂直居中 */
+     padding: 16px 20px;
+     /* 内边距 */
+     border-radius: 12px;
+     /* 圆角 */
+     margin-bottom: 8px;
+     /* 底部外边距 */
+     cursor: pointer;
+     /* 鼠标指针 */
+     transition: all 0.3s;
+     /* 过渡动画 */
+     background: rgba(255, 255, 255, 0.1);
+     /* 半透明背景 */
+ }
 
-/* 导航项悬停效果 */
-.nav-item:hover {
-    background: rgba(255, 255, 255, 0.2); /* 加深背景色 */
-    transform: translateX(5px); /* 向右偏移5px */
-}
+ /* 导航项悬停效果 */
+ .nav-item:hover {
+     background: rgba(255, 255, 255, 0.2);
+     /* 加深背景色 */
+     transform: translateX(5px);
+     /* 向右偏移5px */
+ }
 
-/* 激活状态的导航项 */
-.nav-item.active {
-    background: rgba(255, 255, 255, 0.25); /* 更深的背景色 */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* 激活状态阴影 */
-}
+ /* 激活状态的导航项 */
+ .nav-item.active {
+     background: rgba(255, 255, 255, 0.25);
+     /* 更深的背景色 */
+     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+     /* 激活状态阴影 */
+ }
 
-/* 导航图标样式 */
-.nav-icon {
-    font-size: 22px; /* 图标大小 */
-    margin-right: 15px; /* 右侧外边距 */
-    width: 30px; /* 固定宽度 */
-    text-align: center; /* 图标居中 */
-}
+ /* 导航图标样式 */
+ .nav-icon {
+     font-size: 22px;
+     /* 图标大小 */
+     margin-right: 15px;
+     /* 右侧外边距 */
+     width: 30px;
+     /* 固定宽度 */
+     text-align: center;
+     /* 图标居中 */
+ }
 
-/* 导航文字样式 */
-.nav-text {
-    font-size: 17px; /* 字体大小 */
-    font-weight: 500; /* 字体粗细 */
-}
+ /* 导航文字样式 */
+ .nav-text {
+     font-size: 17px;
+     /* 字体大小 */
+     font-weight: 500;
+     /* 字体粗细 */
+ }
 
 
  .nav-text {
@@ -168,463 +258,737 @@ body {
      font-weight: 500;
  }
 
- /* 侧边栏 折叠按钮 */
+
+ /* 侧边栏折叠按钮 */
  .toggle-btn {
      position: absolute;
+     /* 绝对定位 */
      bottom: 20px;
+     /* 距离底部20px */
      right: -15px;
+     /* 超出右侧15px（居中显示在侧边栏边缘） */
      width: 30px;
+     /* 宽度30px */
      height: 30px;
+     /* 高度30px */
      background: white;
+     /* 白色背景 */
      border-radius: 50%;
+     /* 圆形按钮 */
      display: flex;
+     /* flex布局 */
      align-items: center;
+     /* 垂直居中 */
      justify-content: center;
+     /* 水平居中 */
      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+     /* 阴影 */
      cursor: pointer;
+     /* 鼠标指针 */
      z-index: 15;
+     /* 层级高于侧边栏内容 */
      transition: all 0.3s ease;
+     /* 过渡动画 */
  }
 
+ /* 折叠按钮悬停效果 */
  .toggle-btn:hover {
      transform: scale(1.1);
+     /* 放大1.1倍 */
  }
 
+ /* 折叠按钮图标 */
  .toggle-btn i {
+    
      color: #6e8efb;
+     /* 图标颜色 */
      font-size: 16px;
+     /* 图标大小 */
      transition: transform 0.3s ease;
+     /* 旋转过渡动画 */
  }
 
- /* 折叠状态 */
+ /* 侧边栏折叠状态 */
  .sidebar.collapsed {
      width: 70px;
+     /* 折叠后宽度70px */
  }
 
+ /* 折叠状态下隐藏文字元素 */
  .sidebar.collapsed .user-name,
  .sidebar.collapsed .user-role,
  .sidebar.collapsed .nav-text {
      display: none;
+     /* 隐藏文字 */
  }
 
+ /* 折叠状态下的导航项 */
  .sidebar.collapsed .nav-item {
      padding: 14px;
+     /* 减少内边距 */
      justify-content: center;
+     /* 图标居中 */
  }
 
+ /* 折叠状态下的导航图标 */
  .sidebar.collapsed .nav-icon {
      margin-right: 0;
+     /* 取消右侧外边距 */
      font-size: 24px;
+     /* 增大图标 */
  }
 
+ /* 折叠状态下的用户头像 */
  .sidebar.collapsed .user-avatar {
      width: 40px;
+     /* 缩小头像 */
      height: 40px;
+     /* 缩小头像 */
      font-size: 18px;
+     /* 缩小图标 */
      margin-bottom: 10px;
+     /* 减少底部外边距 */
  }
 
+ /* 折叠状态下的用户信息区域 */
  .sidebar.collapsed .user-info {
      padding: 10px 5px;
+     /* 减少内边距 */
  }
 
+ /* 折叠状态下的按钮图标旋转 */
  .sidebar.collapsed .toggle-btn i {
      transform: rotate(180deg);
+     /* 图标旋转180度 */
  }
 
- /* 折叠状态下的工具提示 */
+ /* 折叠状态下的导航项提示框 */
  .collapsed .nav-item .tooltip {
      visibility: hidden;
+     /* 默认隐藏 */
      background-color: #333;
+     /* 背景色 */
      color: #fff;
+     /* 文字颜色 */
      text-align: center;
+     /* 文字居中 */
      border-radius: 6px;
+     /* 圆角 */
      padding: 8px 12px;
+     /* 内边距 */
      position: absolute;
+     /* 绝对定位 */
      z-index: 20;
+     /* 高层级显示 */
      left: 70px;
+     /* 显示在侧边栏右侧 */
      opacity: 0;
+     /* 初始透明 */
      transition: opacity 0.3s;
+     /* 透明度过渡 */
      font-size: 14px;
+     /* 字体大小 */
      white-space: nowrap;
+     /* 不换行 */
  }
 
+ /* 折叠状态下导航项悬停显示提示框 */
  .collapsed .nav-item:hover .tooltip {
      visibility: visible;
+     /* 显示提示框 */
      opacity: 1;
- }
-
- /* 用户信息区域添加悬停效果 */
- .user-info {
-     cursor: pointer;
-     transition: all 0.3s;
- }
-
- .user-info:hover {
-     background: rgba(255, 255, 255, 0.1);
-     border-radius: 12px;
- }
-
- /* 调整用户切换菜单位置 */
- .user-switch-menu {
-     position: absolute;
-     top: 120px;
-     /* 调整到用户信息下方 */
-     left: 50%;
-     transform: translateX(-50%);
-     /* 其他样式保持不变... */
- }
-
- .sidebar.collapsed .user-switch-menu {
-     left: 80px;
-     top: 80px;
- }
-
- .sidebar.collapsed .user-switch-menu:before {
-     left: -10px;
-     top: 50%;
-     transform: translateY(-50%);
-     border-width: 10px 10px 10px 0;
-     border-color: transparent white transparent transparent;
+     /* 完全不透明 */
  }
 
 
- /******** 内容 ***********/
 
- /* 内容区域样式 */
+ /* 内容区域容器 */
  .content-area {
      flex: 1;
+     /* 占据剩余空间 */
      padding: 35px;
+     /* 内边距35px */
      overflow-y: auto;
+     /* 垂直滚动 */
      background: #f0f5ff;
+     /* 背景色 */
  }
 
- /* 内容头 */
-
+ /* 内容头部区域 */
  .content-header {
      margin-bottom: 30px;
+     /* 底部外边距 */
      padding-bottom: 20px;
+     /* 底部内边距 */
      border-bottom: 1px solid #e0e8ff;
+     /* 底部边框 */
  }
 
- /* 内容标题 */
+ /* 内容标题样式 */
  .content-title {
      font-size: 32px;
+     /* 字体大小 */
      color: #2c3e50;
+     /* 字体颜色 */
      font-weight: 700;
+     /* 字体粗细 */
      display: flex;
+     /* flex布局 */
      align-items: center;
+     /* 垂直居中 */
      margin-bottom: 8px;
+     /* 底部外边距 */
  }
 
- /* 内容标题 i */
-
+ /* 内容标题图标 */
  .content-title i {
      margin-right: 15px;
+     /* 右侧外边距 */
      color: #3a7bd5;
+     /* 图标颜色 */
      background: #e0e8ff;
+     /* 图标背景 */
      width: 60px;
+     /* 图标容器宽度 */
      height: 60px;
+     /* 图标容器高度 */
      border-radius: 50%;
+     /* 圆形图标容器 */
      display: flex;
+     /* flex布局 */
      align-items: center;
+     /* 垂直居中 */
      justify-content: center;
+     /* 水平居中 */
  }
 
  /* 内容副标题 */
  .content-subtitle {
      font-size: 18px;
+     /* 字体大小 */
      color: #7f8c8d;
+     /* 字体颜色 */
      margin-left: 75px;
+     /* 左侧缩进（与标题图标对齐） */
  }
 
-
- /* 内容主体 */
+ /* 内容主体区域 */
  .content-body {
      width: 100%;
+     /* 宽度100% */
      overflow-x: auto;
      /* 允许横向滚动 */
      padding-bottom: 20px;
-     /* 避免滚动条遮挡内容 */
+     /* 底部内边距（避免滚动条遮挡） */
  }
 
- /* 优化代码块样式，防止过宽 */
+ /* 代码块样式优化 */
  pre {
      overflow-x: auto;
-     /* 代码块自身也支持横向滚动 */
+     /* 代码块横向滚动 */
      max-width: 100%;
      /* 最大宽度不超过容器 */
      white-space: pre;
-     /* 保留代码格式 */
+     /* 保留原始格式（不自动换行） */
  }
 
  /* 内容卡片样式 */
  .content-card {
      background: white;
+     /* 白色背景 */
      border-radius: 18px;
+     /* 圆角 */
      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+     /* 阴影 */
      padding: 30px;
+     /* 内边距 */
      margin-bottom: 30px;
+     /* 底部外边距 */
      transition: transform 0.3s;
+     /* 变换过渡动画 */
  }
 
- /* 内容卡片 鼠标放置效果 */
+ /* 内容卡片悬停效果 */
  .content-card:hover {
      transform: translateY(-5px);
+     /* 向上浮动5px */
  }
 
+ /* 卡片标题样式 */
  .card-title {
      font-size: 24px;
+     /* 字体大小 */
      margin-bottom: 25px;
+     /* 底部外边距 */
      color: #2c3e50;
+     /* 字体颜色 */
      font-weight: 700;
+     /* 字体粗细 */
      display: flex;
-     align-items: center;
+     /* flex布局 */
  }
 
+ /* 卡片标题中的图标样式 */
  .card-title i {
      margin-right: 12px;
+     /* 图标右侧留白，与文字分隔 */
      color: #00d2ff;
+     /* 图标颜色（亮蓝色） */
      background: #e0f7ff;
+     /* 图标背景色（浅蓝色） */
      width: 45px;
+     /* 图标容器宽度（正方形） */
      height: 45px;
+     /* 图标容器高度（正方形） */
      border-radius: 50%;
+     /* 圆形容器，使图标背景呈圆形 */
      display: flex;
+     /* 使用flex布局 */
      align-items: center;
+     /* 图标在容器内垂直居中 */
      justify-content: center;
+     /* 图标在容器内水平居中 */
  }
 
 
- /* 确保卡片和容器不超出父元素 */
+ /* 确保卡片和容器不超出父元素范围 */
  .content-card,
  .feature-explanation,
  .highlight-box {
      width: 100%;
+     /* 宽度占满父容器 */
      box-sizing: border-box;
-     /* 确保内边距不增加总宽度 */
+     /* 盒模型设置：内边距和边框不增加总宽度 */
  }
 
 
- /* 用户切换菜单 - 关键部分 */
+ /* 用户切换菜单 - 核心样式 */
  .user-switch-menu {
      position: absolute;
+     /* 绝对定位，脱离文档流 */
      top: 140px;
+     /* 距离顶部140px（默认显示在用户信息下方） */
      left: 50%;
+     /* 水平方向居中对齐 */
      transform: translateX(-50%);
+     /* 配合left:50%实现精确居中 */
      background: white;
+     /* 白色背景，与侧边栏区分 */
      border-radius: 18px;
+     /* 圆角边框，增强视觉柔和度 */
      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+     /* 深色阴影，营造悬浮感 */
      width: 220px;
+     /* 固定宽度，保证菜单整齐 */
      padding: 15px 0;
+     /* 上下内边距15px，左右0（子元素自行控制左右间距） */
      z-index: 100;
+     /* 高层级，确保显示在其他元素上方 */
      opacity: 0;
+     /* 默认透明（隐藏状态） */
      visibility: hidden;
+     /* 默认隐藏（不占据空间） */
+     /* 菜单显示/隐藏的过渡动画：0.4秒，使用缓动函数增强质感 */
      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
  }
 
+ /* 用户切换菜单激活状态（显示状态） */
  .user-switch-menu.active {
      opacity: 1;
+     /* 完全不透明 */
      visibility: visible;
+     /* 可见状态 */
      top: 160px;
+     /* 从默认位置向下移动20px（配合动画形成弹出效果） */
  }
 
+ /* 菜单顶部的三角形指示符（指向用户头像） */
  .user-switch-menu:before {
      content: '';
+     /* 伪元素内容为空，仅用于样式 */
      position: absolute;
+     /* 绝对定位，相对于菜单本身 */
      top: -10px;
+     /* 定位到菜单顶部外侧（形成"小箭头"效果） */
      left: 50%;
+     /* 水平居中 */
      transform: translateX(-50%);
+     /* 精确居中 */
      border-width: 0 12px 12px;
+     /* 边框宽度：上0，左右12px，下12px（形成下三角形） */
      border-style: solid;
+     /* 实线边框 */
      border-color: transparent transparent white;
+     /* 颜色：透明 透明 白色（与菜单背景匹配） */
  }
 
+ /* 切换菜单中的选项样式 */
  .switch-user-item {
      padding: 14px 25px;
+     /* 上下14px、左右25px内边距，保证点击区域充足 */
      display: flex;
+     /* flex布局，使图标和文字水平排列 */
      align-items: center;
+     /* 垂直居中对齐 */
      cursor: pointer;
+     /* 鼠标悬停显示指针，提示可点击 */
      transition: all 0.2s;
+     /* 过渡动画，使交互更流畅 */
      font-size: 16px;
+     /* 文字大小 */
      color: #34495e;
+     /* 文字颜色（深灰色，增强可读性） */
  }
 
+ /* 菜单选项悬停效果 */
  .switch-user-item:hover {
      background: #f5f9ff;
+     /* 浅蓝色背景，突出当前选项 */
      transform: translateX(5px);
+     /* 轻微右移，增强交互反馈 */
  }
 
+ /* 菜单选项中的图标样式 */
  .switch-user-item i {
      margin-right: 15px;
+     /* 图标右侧留白，与文字分隔 */
      color: #3a7bd5;
+     /* 图标颜色（主色调蓝色） */
      font-size: 20px;
+     /* 图标大小 */
      width: 25px;
+     /* 固定宽度，确保文字对齐 */
      text-align: center;
+     /* 图标居中 */
  }
 
+ /* 菜单选项中的徽章样式（如"新"标签等，当前代码未直接使用但预留样式） */
  .switch-user-item .badge {
      margin-left: auto;
+     /* 徽章靠右对齐（自动填充左侧空间） */
      background: #00d2ff;
+     /* 徽章背景色 */
      color: white;
+     /* 徽章文字颜色 */
      padding: 3px 10px;
+     /* 内边距，控制徽章大小 */
      border-radius: 12px;
+     /* 圆角徽章 */
      font-size: 12px;
+     /* 小字 */
      font-weight: 600;
+     /* 加粗文字 */
  }
 
- /* 功能说明区域 */
+
+ /* 功能说明区域整体样式 */
  .feature-explanation {
      background: linear-gradient(to right, #e0f7ff, #f0f5ff);
+     /* 浅蓝色渐变背景，区分内容块 */
      border-radius: 18px;
+     /* 圆角边框 */
      padding: 25px;
+     /* 内边距，保证内容与边框的距离 */
      margin: 30px 0;
+     /* 上下外边距30px，与其他内容块分隔 */
      border-left: 5px solid #3a7bd5;
+     /* 左侧蓝色粗边框，强调该区域的重要性 */
  }
 
+ /* 功能说明区域的标题样式 */
  .feature-title {
      font-size: 26px;
+     /* 标题大小 */
      color: #2c3e50;
+     /* 标题颜色（深灰色，增强对比度） */
      margin-bottom: 20px;
+     /* 底部留白，与内容分隔 */
      display: flex;
+     /* flex布局，使图标和文字对齐 */
      align-items: center;
+     /* 垂直居中 */
  }
 
+ /* 功能说明标题中的图标样式 */
  .feature-title i {
      margin-right: 15px;
+     /* 图标右侧留白 */
      color: #3a7bd5;
+     /* 图标颜色（主色调蓝色） */
      font-size: 30px;
+     /* 图标大小，突出显示 */
  }
 
+ /* 功能说明的内容区域样式 */
  .feature-content {
      line-height: 1.8;
+     /* 行高1.8倍，增强文字可读性 */
      color: #34495e;
+     /* 文字颜色（中灰色，柔和不刺眼） */
      font-size: 17px;
+     /* 文字大小 */
      padding-left: 45px;
+     /* 左侧缩进，与标题图标对齐，形成视觉层次 */
  }
 
+ /* 功能说明中的列表样式 */
  .feature-content ul {
      margin: 20px 0;
+     /* 上下外边距20px，与其他内容分隔 */
      padding-left: 20px;
+     /* 左侧内边距，为列表符号留白 */
  }
 
+ /* 列表项样式 */
  .feature-content li {
      margin-bottom: 15px;
+     /* 列表项之间的垂直间距 */
      position: relative;
+     /* 相对定位，用于自定义列表符号 */
      padding-left: 30px;
+     /* 左侧留白，为自定义符号预留空间 */
  }
 
+ /* 列表项前的自定义符号（使用伪元素实现） */
  .feature-content li:before {
      content: '✓';
+     /* 符号内容（勾选标记） */
      position: absolute;
+     /* 绝对定位，相对于列表项 */
      left: 0;
+     /* 左侧对齐 */
      top: 0;
+     /* 顶部对齐 */
      color: #00d2ff;
+     /* 符号颜色（亮蓝色，与主题呼应） */
      font-weight: bold;
+     /* 加粗显示 */
      font-size: 18px;
+     /* 符号大小 */
  }
 
- /* 用户卡片 */
+
+ /* 用户卡片容器样式（用于展示多账户信息） */
  .user-card {
      display: flex;
+     /* flex布局，使内容水平排列 */
      align-items: center;
+     /* 垂直居中对齐 */
      padding: 20px;
+     /* 内边距，保证内容与边框距离 */
      background: white;
+     /* 白色背景，突出卡片感 */
      border-radius: 16px;
+     /* 圆角边框 */
      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+     /* 轻微阴影，营造悬浮感 */
      margin: 15px 0;
+     /* 卡片之间的垂直间距 */
      transition: all 0.3s;
+     /* 过渡动画，增强交互体验 */
      cursor: pointer;
+     /* 鼠标悬停显示指针，提示可点击切换用户 */
  }
 
+ /* 用户卡片悬停效果 */
  .user-card:hover {
      transform: translateX(10px);
+     /* 向右轻微移动，增强交互反馈 */
      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+     /* 加深阴影，突出当前卡片 */
  }
 
+ /* 用户卡片中的头像样式 */
  .user-card-avatar {
      width: 70px;
+     /* 头像宽度 */
      height: 70px;
+     /* 头像高度（与宽度一致，形成圆形） */
      border-radius: 50%;
+     /* 圆形头像 */
      display: flex;
+     /* flex布局，使图标居中 */
      align-items: center;
+     /* 垂直居中 */
      justify-content: center;
+     /* 水平居中 */
      font-size: 28px;
+     /* 图标大小 */
      color: white;
+     /* 图标颜色（白色，与彩色背景对比） */
      margin-right: 20px;
+     /* 右侧留白，与文字信息分隔 */
  }
 
+ /* 用户卡片中的信息容器（用户名和角色） */
  .user-card-info {
      flex: 1;
+     /* 占据剩余空间，使信息区域自适应宽度 */
  }
 
+ /* 用户名样式 */
  .user-card-name {
      font-size: 19px;
+     /* 用户名大小 */
      font-weight: 600;
+     /* 加粗显示，突出用户名 */
      color: #2c3e50;
+     /* 文字颜色（深灰色） */
      margin-bottom: 5px;
+     /* 底部留白，与角色信息分隔 */
  }
 
+ /* 用户角色样式（如"高级会员"） */
  .user-card-role {
      font-size: 14px;
+     /* 角色文字较小 */
      color: #7f8c8d;
+     /* 文字颜色（浅灰色） */
      background: #f5f7fa;
+     /* 浅灰色背景，突出角色标签 */
      padding: 3px 12px;
+     /* 内边距，形成标签效果 */
      border-radius: 15px;
+     /* 圆角标签 */
      display: inline-block;
+     /* 行内块元素，适应内容宽度 */
  }
 
+ /* 用户状态样式（如"当前账户"、"可切换"） */
  .user-card-status {
      margin-left: auto;
+     /* 靠右对齐（利用flex布局的自动填充特性） */
      font-size: 14px;
+     /* 文字大小 */
      color: #27ae60;
+     /* 颜色（绿色，表示状态正常） */
      font-weight: 600;
+     /* 加粗显示 */
  }
 
- /* 响应式设计 */
+
+ /* 响应式设计：针对屏幕宽度≤768px的设备（如手机） */
  @media (max-width: 768px) {
      .app-container {
          flex-direction: column;
          height: auto;
      }
 
+     /* 侧边栏改为横向排列 */
      .sidebar {
          width: 100%;
-         padding: 20px 0;
+         height: auto;
+         padding: 10px 0;
+         flex-direction: col;
+         flex-wrap: wrap;
      }
 
-     .user-switch-menu {
-         top: 180px;
-         left: 50%;
-         transform: translateX(-50%);
+     /* 隐藏用户信息和折叠按钮 */
+     /* .user-info,
+    .toggle-btn {
+        display: none;
+    } */
+     .toggle-btn{
+        bottom: -12px;
+        right: 10px;
+        /* transform: rotate(180deg); */
+     }
+     .toggle-btn i{
+        transform: rotate(90deg);
+     }
+     .sidebar.collapsed .toggle-btn i{
+         transform: rotate(270deg);
+     }
+     /* 导航菜单改为横向排列 */
+     .nav-menu {
+         flex: none;
+         display: flex;
+         flex-direction: row; /* 纵向排列（每个 div 占一行） */
+         width: 100%;
+         padding: 0;
      }
 
-     .user-switch-menu.active {
-         top: 200px;
+     /* 导航项样式调整 */
+     .nav-item {
+         flex: 1;
+         min-width: 60px;
+         flex-direction: column;
+         padding: 10px 5px;
+         margin: 0 2px;
+         text-align: center;
      }
 
+     .nav-icon {
+         margin-right: 0;
+         margin-bottom: 5px;
+     }
+
+     .nav-text {
+         font-size: 12px;
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+     }
+
+     /* 折叠状态下的样式重置 */
+     .sidebar.collapsed {
+         width: 100%;
+     }
+
+     /* 内容区域调整 */
      .content-area {
-         padding: 25px;
+         padding: 20px;
+     }
+
+     /* 内容标题调整 */
+     .content-title {
+         font-size: 24px;
+     }
+
+     .content-title i {
+         width: 45px;
+         height: 45px;
+         font-size: 20px;
+     }
+
+     .content-subtitle {
+         font-size: 16px;
+         margin-left: 60px;
      }
  }
 
+ /* 高亮提示框样式（用于显示重要信息） */
  .highlight-box {
      background: linear-gradient(45deg, #3a7bd5, #00d2ff);
+     /* 蓝色渐变背景，突出重要性 */
      color: white;
+     /* 文字白色，与背景形成高对比度 */
      padding: 25px;
+     /* 内边距 */
      border-radius: 18px;
+     /* 圆角边框 */
      margin: 30px 0;
+     /* 上下外边距，与其他内容分隔 */
      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+     /* 较深阴影，增强层次感 */
  }
 
+ /* 高亮提示框的标题样式 */
  .highlight-title {
      font-size: 26px;
+     /* 标题大小 */
      margin-bottom: 15px;
+     /* 底部留白，与内容分隔 */
      display: flex;
+     /* flex布局，使图标和文字对齐 */
      align-items: center;
+     /* 垂直居中 */
  }
 
+ /* 高亮提示框标题中的图标样式 */
  .highlight-title i {
      margin-right: 15px;
+     /* 图标右侧留白 */
      font-size: 32px;
+     /* 图标大小，增强视觉冲击力 */
  }
-
