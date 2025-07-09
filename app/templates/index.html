@@ -1,383 +1,682 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>隐私优先健康管理</title>
+    <title>智能助手应用 - 优化版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #4a6fa5;
-            --secondary: #6b8cbc;
-            --light: #e9f1f7;
-            --success: #4caf50;
-            --warning: #ff9800;
-            --danger: #f44336;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 1rem 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .header-content {
+            background: linear-gradient(135deg, #84fab0, #8fd3f4, #84fab0); 
+            min-height: 100vh;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-        }
-        
-        .privacy-badge {
-            background-color: var(--success);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-        
-        .card-header {
-            background-color: var(--light);
-            padding: 15px 20px;
-            border-bottom: 1px solid #eee;
-            font-weight: bold;
-        }
-        
-        .card-body {
             padding: 20px;
         }
+
         
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+        /* 登录界面样式 */
+        .login-container {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.5s ease;
+            transform: translateY(0);
+            opacity: 1;
+        }
+        /* 登录界面隐藏 */
+        .login-container.hidden {
+            display: none;                    /*不展示*/
+            transform: translateY(-30px);     /*向上平移*/
+            opacity: 0;                       /*不透明度为0*/
+            pointer-events: none;             /*禁用鼠标事件*/
+        }
+        
+        .app-logo {
+            color: #6e8efb;
+            font-size: 2.8rem;
             margin-bottom: 20px;
         }
         
-        .form-group {
-            margin-bottom: 15px;
+        .app-title {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 30px;
+            font-weight: 600;
         }
         
-        label {
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .input-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            color: #555;
             font-weight: 500;
         }
         
-        input, select {
+        .input-group input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
         }
         
-        .btn {
-            display: inline-block;
-            background: var(--primary);
+        .input-group input:focus {
+            border-color: #6e8efb;
+            outline: none;
+        }
+        
+        .login-btn {
+            background: linear-gradient(to right, #6e8efb, #a777e3);
             color: white;
-            padding: 10px 20px;
             border: none;
-            border-radius: 4px;
+            padding: 14px 0;
+            width: 100%;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 10px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(110, 142, 251, 0.4);
+        }
+        
+        /* 主界面样式 */
+        .main-container {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .main-container.active {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(to bottom, #6e8efb, #5a6fd8);
+            color: white;
+            padding: 25px 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+        
+        .user-info {
+            text-align: center;
+            padding: 0 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            margin-bottom: 15px;
+            background: #a777e3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+        }
+        
+        .user-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .user-role {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .nav-menu {
+            flex: 1;
+            padding: 0 15px;
+        }
+        /* 侧边栏切换选项样式 */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
             transition: background 0.3s;
         }
-        
-        .btn:hover {
-            background: var(--secondary);
+        /* 侧边栏切换选项样式: 悬停 */
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.15);
         }
-        
-        .btn-danger {
-            background: var(--danger);
+        /* 侧边栏切换选项样式: 选中 */
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.25);
         }
-        
-        .btn-danger:hover {
-            background: #d32f2f;
-        }
-        
-        .btn-reset {
-            background: var(--warning);
-        }
-        
-        .btn-reset:hover {
-            background: #f57c00;
-        }
-        
-        .score-display {
+        /* 侧边栏切换选项图标 */
+        .nav-icon {
+            font-size: 20px;
+            margin-right: 15px;
+            width: 24px;
             text-align: center;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border-radius: 8px;
-            margin: 20px 0;
+        }
+        /* 侧边栏切换选项文字 */
+        .nav-text {
+            font-size: 16px;
+            font-weight: 500;
         }
         
-        .score-value {
-            font-size: 3rem;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .data-table th, .data-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .data-table th {
-            background-color: var(--light);
-        }
-        
-        .delete-btn {
-            color: var(--danger);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            font-size: 0.9rem;
-            margin-top: 40px;
-        }
-        
-        .privacy-notice {
-            background-color: var(--light);
+        /* 用户切换按钮 - 默认样式 */
+        .user-switch-btn {
+            margin: 20px 15px 15px;
             padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            z-index: 5;
         }
         
-        .chart-container {
-            width: 100%;
-            height: 400px;
+        .user-switch-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .user-switch-btn i {
+            font-size: 24px;
+        }
+        
+        /* 内容区域样式 */
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background: #f8f9ff;
+        }
+        
+        .content-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .content-title {
+            font-size: 28px;
+            color: #444;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .content-title i {
+            margin-right: 12px;
+            color: #6e8efb;
+        }
+        
+        .content-subtitle {
+            font-size: 16px;
+            color: #777;
+            margin-top: 5px;
+            margin-left: 38px;
+        }
+        
+        .content-card {
             background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 20px;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #444;
+            font-weight: 600;
+        }
+        
+        /* 用户切换菜单 */
+        .user-switch-menu {
+            position: absolute;
+            bottom: 90px;
+            left: 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 200px;
+            padding: 15px 0;
+            z-index: 10;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .user-switch-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .user-switch-menu:before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent;
+        }
+        
+        .switch-user-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .switch-user-item:hover {
+            background: #f5f7ff;
+        }
+        
+        .switch-user-item i {
+            margin-right: 12px;
+            color: #6e8efb;
+            font-size: 18px;
+        }
+        
+        /* 大屏幕时用户切换按钮定位在左下角 */
+        @media (min-width: 1200px) {
+            .user-switch-btn {
+                position: absolute;
+                bottom: 25px;
+                left: 25px;
+                margin: 0;
+            }
+            
+            .user-switch-menu {
+                bottom: 85px;
+                left: 25px;
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1199px) {
+            .user-switch-btn {
+                margin: 20px auto 15px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 15px 0;
+            }
+            
+            .nav-menu {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-item {
+                margin: 5px;
+                padding: 10px 15px;
+            }
+            
+            .user-info {
+                padding-bottom: 15px;
+                margin-bottom: 10px;
+            }
+            
+            .user-switch-btn {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                left: auto;
+                margin: 0;
+            }
+            
+            .user-switch-menu {
+                bottom: auto;
+                top: 70px;
+                left: auto;
+                right: 15px;
+            }
+            
+            .user-switch-menu:before {
+                bottom: auto;
+                top: -10px;
+                border-width: 0 10px 10px;
+                border-color: transparent transparent white;
+            }
+            
+            .content-area {
+                padding: 20px;
+            }
+        }
+        
+        .screen-size-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 100;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container header-content">
-            <h1>隐私优先健康助手</h1>
-            <div class="privacy-badge">所有数据存储在您的设备上</div>
+    <!-- 登录界面 -->
+    <div class="login-container" id="loginContainer">
+        <div class="app-logo">
+            <i class="fas fa-robot"></i>
         </div>
-    </header>
-    
-    <div class="container">
-        <div class="privacy-notice">
-            <strong>隐私保护说明：</strong> 
-            您的所有健康数据都在浏览器中加密处理，仅存储在您的设备上。
-            我们不会将您的数据发送到服务器，也不会跟踪您的活动。
+        <h1 class="app-title">智能助手应用</h1>
+        
+        <div class="input-group">
+            <label for="username">用户名</label>
+            <input type="text" id="username" placeholder="请输入用户名">
         </div>
         
-        <div class="grid">
-            <div class="card">
-                <div class="card-header">添加健康数据</div>
-                <div class="card-body">
-                    <form action="/add-data" method="post">
-                        <div class="form-group">
-                            <label for="height">身高 (cm)</label>
-                            <input type="number" step="0.1" id="height" name="height" required min="100" max="250">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="weight">体重 (kg)</label>
-                            <input type="number" step="0.1" id="weight" name="weight" required min="30" max="300">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="sleep_hours">睡眠时长 (小时)</label>
-                            <input type="number" step="0.1" id="sleep_hours" name="sleep_hours" required min="0" max="24">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="exercise_minutes">运动时间 (分钟)</label>
-                            <input type="number" id="exercise_minutes" name="exercise_minutes" required min="0" max="500">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="mood">今日心情 (1-5分)</label>
-                            <select id="mood" name="mood" required>
-                                <option value="5">😄 非常好 (5分)</option>
-                                <option value="4">🙂 好 (4分)</option>
-                                <option value="3" selected>😐 一般 (3分)</option>
-                                <option value="2">😕 不太好 (2分)</option>
-                                <option value="1">😞 差 (1分)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="diet_quality">饮食质量 (1-5分)</label>
-                            <select id="diet_quality" name="diet_quality" required>
-                                <option value="5">🥗 非常健康 (5分)</option>
-                                <option value="4">🥦 健康 (4分)</option>
-                                <option value="3" selected>🍱 一般 (3分)</option>
-                                <option value="2">🍔 不太健康 (2分)</option>
-                                <option value="1">🍟 不健康 (1分)</option>
-                            </select>
-                        </div>
-                        
-                        <button type="submit" class="btn">保存数据</button>
-                    </form>
+        <div class="input-group">
+            <label for="password">密码</label>
+            <input type="password" id="password" placeholder="请输入密码">
+        </div>
+        
+        <button class="login-btn" id="loginBtn">
+            <i class="fas fa-sign-in-alt"></i> 登录
+        </button>
+    </div>
+    
+    <!-- 主界面 -->
+    <div class="main-container" id="mainContainer">
+        <!-- 左侧导航 -->
+        <div class="sidebar">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-name">张小明</div>
+                <div class="user-role">高级会员</div>
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item active" data-view="chat">
+                    <div class="nav-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </div>
+                <div class="nav-item active" data-view="chat">
+                    <div class="nav-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="nav-text">对话</div>
+                </div>
+                
+                <div class="nav-item" data-view="test">
+                    <div class="nav-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="nav-text">心理测试</div>
+                </div>
+                
+                <div class="nav-item" data-view="info">
+                    <div class="nav-icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="nav-text">我的信息</div>
+                </div>
+                
+                <div class="nav-item" data-view="advice">
+                    <div class="nav-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="nav-text">管家意见</div>
                 </div>
             </div>
             
-            <div class="card">
-                <div class="card-header">健康概览</div>
-                <div class="card-body">
-                    {% if user_data %}
-                        {% set latest = user_data.values()|last %}
-                        <div class="score-display">
-                            <div>当前健康评分</div>
-                            <div class="score-value">{{ latest.score }}%</div>
-                            <div>
-                                {% if latest.score >= 80 %}
-                                    优秀！继续保持
-                                {% elif latest.score >= 60 %}
-                                    良好，还有提升空间
-                                {% else %}
-                                    需要注意健康习惯
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>BMI指数</label>
-                            <div class="bmi-value">{{ (latest.weight / ((latest.height/100) ** 2))|round(1) }}</div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>健康建议</label>
-                            <ul>
-                                {% if latest.sleep_hours < 7 %}
-                                    <li>建议增加睡眠时间</li>
-                                {% endif %}
-                                {% if latest.exercise_minutes < 30 %}
-                                    <li>建议增加运动时间</li>
-                                {% endif %}
-                                {% if latest.mood < 3 %}
-                                    <li>尝试进行放松活动</li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                    {% else %}
-                        <p>暂无健康数据，请添加您的健康信息</p>
-                    {% endif %}
+            <!-- 用户切换按钮 -->
+            <div class="user-switch-btn" id="userSwitchBtn">
+                <i class="fas fa-sync-alt"></i>
+            </div>
+            
+            <!-- 用户切换菜单 -->
+            <div class="user-switch-menu" id="userSwitchMenu">
+                <div class="switch-user-item">
+                    <i class="fas fa-user"></i> 用户一
+                </div>
+                <div class="switch-user-item">
+                    <i class="fas fa-user"></i> 用户二
+                </div>
+                <div class="switch-user-item">
+                    <i class="fas fa-user-plus"></i> 添加用户
+                </div>
+                <div class="switch-user-item">
+                    <i class="fas fa-sign-out-alt"></i> 退出登录
                 </div>
             </div>
         </div>
         
-        {% if user_data %}
-        <div class="card">
-            <div class="card-header">健康数据历史</div>
-            <div class="card-body">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>日期</th>
-                            <th>体重 (kg)</th>
-                            <th>睡眠 (小时)</th>
-                            <th>运动 (分钟)</th>
-                            <th>心情</th>
-                            <th>饮食</th>
-                            <th>健康分</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for id, record in user_data.items() %}
-                        <tr>
-                            <td>{{ record.date }}</td>
-                            <td>{{ record.weight }}</td>
-                            <td>{{ record.sleep_hours }}</td>
-                            <td>{{ record.exercise_minutes }}</td>
-                            <td>
-                                {% if record.mood == 5 %}😄{% endif %}
-                                {% if record.mood == 4 %}🙂{% endif %}
-                                {% if record.mood == 3 %}😐{% endif %}
-                                {% if record.mood == 2 %}😕{% endif %}
-                                {% if record.mood == 1 %}😞{% endif %}
-                            </td>
-                            <td>
-                                {% if record.diet_quality == 5 %}🥗{% endif %}
-                                {% if record.diet_quality == 4 %}🥦{% endif %}
-                                {% if record.diet_quality == 3 %}🍱{% endif %}
-                                {% if record.diet_quality == 2 %}🍔{% endif %}
-                                {% if record.diet_quality == 1 %}🍟{% endif %}
-                            </td>
-                            <td>{{ record.score }}%</td>
-                            <td>
-                                <form action="/delete-data" method="post" style="display:inline;">
-                                    <input type="hidden" name="record_id" value="{{ id }}">
-                                    <button type="submit" class="delete-btn">🗑️</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <!-- 右侧内容区域 -->
+        <div class="content-area">
+            <div class="content-header">
+                <h1 class="content-title">
+                    <i class="fas fa-comments"></i> 对话
+                </h1>
+                <p class="content-subtitle">与智能助手交流，获取帮助与建议</p>
+            </div>
+            
+            <div class="content-card">
+                <h2 class="card-title">用户切换按钮位置说明</h2>
+                <p>根据屏幕宽度不同，用户切换按钮的位置会发生变化：</p>
+                <ul style="margin: 15px 0 15px 25px;">
+                    <li><strong>大屏幕 (≥1200px)</strong>：按钮固定在左下角</li>
+                    <li><strong>中等屏幕 (768px-1199px)</strong>：按钮在导航栏底部居中</li>
+                    <li><strong>小屏幕 (≤768px)</strong>：按钮在右上角</li>
+                </ul>
+                <p>请尝试调整浏览器窗口大小来查看效果。</p>
+            </div>
+            
+            <div class="content-card">
+                <h2 class="card-title">心理测试</h2>
+                <p>我们提供专业的心理测试服务，帮助您更好地了解自己。测试内容包括：</p>
+                <ul style="margin: 15px 0 15px 25px;">
+                    <li>个性特征测试</li>
+                    <li>情绪状态评估</li>
+                    <li>职业倾向测试</li>
+                    <li>人际关系分析</li>
+                </ul>
+                <button class="login-btn" style="max-width: 200px; padding: 10px;">
+                    开始测试 <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+            
+            <div class="content-card">
+                <h2 class="card-title">最近对话</h2>
+                <div style="background: #f9f9ff; border-radius: 12px; padding: 15px; margin: 10px 0;">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <div style="width: 36px; height: 36px; background: #6e8efb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                            <i class="fas fa-user" style="color: white;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 500;">我: 最近感到压力很大怎么办？</div>
+                            <div style="font-size: 13px; color: #888;">今天 10:23</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <div style="width: 36px; height: 36px; background: #a777e3; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                            <i class="fas fa-robot" style="color: white;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 500;">智能助手: 建议您尝试深呼吸练习，每天安排15分钟冥想...</div>
+                            <div style="font-size: 13px; color: #888;">今天 10:25</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <div class="card">
-            <div class="card-header">健康趋势图</div>
-            <div class="card-body">
-                {% if chart_img %}
-                    <img src="data:image/png;base64,{{ chart_img }}" alt="健康趋势图" style="width:100%;">
-                {% else %}
-                    <p>添加更多数据以生成趋势图</p>
-                {% endif %}
-            </div>
-        </div>
-        
-        <div style="text-align: center; margin-top: 20px;">
-            <form action="/reset-all" method="post">
-                <button type="submit" class="btn btn-reset">清除所有数据</button>
-            </form>
-            <p style="font-size: 0.8rem; margin-top: 10px;">
-                注意：清除数据将永久删除设备上的所有健康记录
-            </p>
-        </div>
-        {% endif %}
     </div>
-    
-    <footer>
-        <p>隐私优先健康助手 &copy; 2025 | 您的数据只属于您</p>
-    </footer>
+
+    <!-- <div class="screen-size-indicator" id="sizeIndicator"></div> -->
+
+    <script>
+        // 测试
+        document.getElementById('loginContainer').classList.add('hidden');
+        document.getElementById('mainContainer').classList.add('active');
+        //测试结束
+
+
+
+        // 登录功能
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if(username && password) {
+                // 隐藏登录界面
+                document.getElementById('loginContainer').classList.add('hidden');
+                
+                // 显示主界面（延迟显示以展示动画）
+                setTimeout(() => {
+                    document.getElementById('mainContainer').classList.add('active');
+                }, 300);
+            } else {
+                alert('请输入用户名和密码');
+            }
+        });
+        
+        // 导航菜单功能
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // 移除所有active类
+                navItems.forEach(nav => nav.classList.remove('active'));
+                // 添加active类到当前项
+                this.classList.add('active');
+                
+                // 更新内容区域标题
+                const view = this.getAttribute('data-view');
+                const contentTitle = document.querySelector('.content-title');
+                const contentSubtitle = document.querySelector('.content-subtitle');
+                
+                switch(view) {
+                    case 'chat':
+                        contentTitle.innerHTML = '<i class="fas fa-comments"></i> 对话';
+                        contentSubtitle.textContent = '与智能助手交流，获取帮助与建议';
+                        break;
+                    case 'test':
+                        contentTitle.innerHTML = '<i class="fas fa-brain"></i> 心理测试';
+                        contentSubtitle.textContent = '通过专业测试了解自己的心理状态';
+                        break;
+                    case 'info':
+                        contentTitle.innerHTML = '<i class="fas fa-user-circle"></i> 我的信息';
+                        contentSubtitle.textContent = '查看和管理您的个人信息';
+                        break;
+                    case 'advice':
+                        contentTitle.innerHTML = '<i class="fas fa-lightbulb"></i> 管家意见';
+                        contentSubtitle.textContent = '获取个性化建议和行动计划';
+                        break;
+                }
+            });
+        });
+        
+        // 用户切换功能
+        const userSwitchBtn = document.getElementById('userSwitchBtn');
+        const userSwitchMenu = document.getElementById('userSwitchMenu');
+        
+        userSwitchBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userSwitchMenu.classList.toggle('active');
+        });
+        
+        // 点击页面其他区域关闭用户切换菜单
+        document.addEventListener('click', function(e) {
+            if(userSwitchMenu.classList.contains('active')) {
+                userSwitchMenu.classList.remove('active');
+            }
+        });
+        
+        // 阻止菜单点击事件冒泡
+        userSwitchMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
+        // 屏幕尺寸指示器
+        function updateSizeIndicator() {
+            const width = window.innerWidth;
+            let size = '';
+            
+            if(width >= 1200) {
+                size = '大屏幕 (≥1200px) - 按钮在左下角';
+            } else if(width >= 768) {
+                size = '中等屏幕 (768px-1199px) - 按钮在底部居中';
+            } else {
+                size = '小屏幕 (≤768px) - 按钮在右上角';
+            }
+            
+            document.getElementById('sizeIndicator').textContent = 
+                `当前屏幕宽度: ${width}px - ${size}`;
+        }
+        
+        window.addEventListener('resize', updateSizeIndicator);
+        updateSizeIndicator();
+    </script>
 </body>
 </html>
