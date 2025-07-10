@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能助手应用 - 优化版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #84fab0, #8fd3f4, #84fab0);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+
+        /* 登录界面样式 */
+        .login-container {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.5s ease;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* 登录界面隐藏 */
+        .login-container.hidden {
+            display: none;
+            /*不展示*/
+            transform: translateY(-30px);
+            /*向上平移*/
+            opacity: 0;
+            /*不透明度为0*/
+            pointer-events: none;
+            /*禁用鼠标事件*/
+        }
+
+        .app-logo {
+            color: #6e8efb;
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+        }
+
+        .app-title {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #6e8efb;
+            outline: none;
+        }
+
+        .login-btn {
+            background: linear-gradient(to right, #6e8efb, #a777e3);
+            color: white;
+            border: none;
+            padding: 14px 0;
+            width: 100%;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(110, 142, 251, 0.4);
+        }
+
+        /* 主界面样式 */
+        .main-container {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .main-container.active {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(to bottom, #6e8efb, #5a6fd8);
+            color: white;
+            padding: 25px 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+
+        .user-info {
+            text-align: center;
+            padding: 0 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            margin-bottom: 15px;
+            background: #a777e3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+        }
+
+        .user-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .user-role {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 0 15px;
+        }
+
+        /* 侧边栏切换选项样式 */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        /* 侧边栏切换选项样式: 悬停 */
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* 侧边栏切换选项样式: 选中 */
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* 侧边栏切换选项图标 */
+        .nav-icon {
+            font-size: 20px;
+            margin-right: 15px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* 侧边栏切换选项文字 */
+        .nav-text {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* 用户切换按钮 - 默认样式 */
+        .user-switch-btn {
+            margin: 20px 15px 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            z-index: 5;
+        }
+
+        .user-switch-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .user-switch-btn i {
+            font-size: 24px;
+        }
+
+        /* 内容区域样式 */
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background: #f8f9ff;
+        }
+
+        .content-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .content-title {
+            font-size: 28px;
+            color: #444;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .content-title i {
+            margin-right: 12px;
+            color: #6e8efb;
+        }
+
+        .content-subtitle {
+            font-size: 16px;
+            color: #777;
+            margin-top: 5px;
+            margin-left: 38px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #444;
+            font-weight: 600;
+        }
+
+        /* 用户切换菜单 */
+        .user-switch-menu {
+            position: absolute;
+            bottom: 90px;
+            left: 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 200px;
+            padding: 15px 0;
+            z-index: 10;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .user-switch-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .user-switch-menu:before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent;
+        }
+
+        .switch-user-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .switch-user-item:hover {
+            background: #f5f7ff;
+        }
+
+        .switch-user-item i {
+            margin-right: 12px;
+            color: #6e8efb;
+            font-size: 18px;
+        }
+
+        /* 大屏幕时用户切换按钮定位在左下角 */
+        @media (min-width: 769px) {
+            .user-switch-btn {
+                position: absolute;
+                bottom: 25px;
+                left: 50%;
+                /* 设置为50%以使按钮在水平方向上居中 */
+                transform: translateX(-50%);
+                /* 使按钮从50%的位置向左移动其自身宽度的一半，真正居中 */
+                margin: 20px auto 15px;
+                /* 纵向的外边距保持不变 */
+            }
+
+            .user-switch-menu {
+                bottom: 85px;
+                left: 50%;
+                /* 可选：根据需要对菜单也进行居中调整 */
+                transform: translateX(-50%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 15px 0;
+            }
+
+            .nav-menu {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .nav-item {
+                margin: 5px;
+                padding: 10px 15px;
+            }
+
+            .user-info {
+                padding-bottom: 15px;
+                margin-bottom: 10px;
+            }
+
+            .user-switch-btn {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                left: auto;
+                margin: 0;
+            }
+
+            .user-switch-menu {
+                bottom: auto;
+                top: 70px;
+                left: auto;
+                right: 15px;
+            }
+
+            .user-switch-menu:before {
+                bottom: auto;
+                top: -10px;
+                border-width: 0 10px 10px;
+                border-color: transparent transparent white;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+        }
+
+        .screen-size-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 登录界面 -->
+    <div class="login-container" id="loginContainer">
+        <div class="app-logo">
+            <i class="fas fa-robot"></i>
+        </div>
+        <h1 class="app-title">智能助手应用</h1>
+
+        <div class="input-group">
+            <label for="username">用户名</label>
+            <input type="text" id="username" placeholder="请输入用户名">
+        </div>
+
+        <div class="input-group">
+            <label for="password">密码</label>
+            <input type="password" id="password" placeholder="请输入密码">
+        </div>
+
+        <button class="login-btn" id="loginBtn">
+            <i class="fas fa-sign-in-alt"></i> 登录
+        </button>
+    </div>
+
+    <!-- 主界面 -->
+    <div class="main-container" id="mainContainer">
+        <!-- 左侧导航 -->
+        <div class="sidebar">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-name">张小明</div>
+                <div class="user-role">高级会员</div>
+            </div>
+
+            <div class="nav-menu">
+                <div class="nav-item active" data-view="chat">
+                    <div class="nav-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="nav-text">首页</div>
+                </div>
+                <div class="nav-item active" data-view="chat">
+                    <div class="nav-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="nav-text">对话</div>
+                </div>
+
+                <div class="nav-item" data-view="test">
+                    <div class="nav-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="nav-text">心理测试</div>
+                </div>
+
+                <div class="nav-item" data-view="info">
+                    <div class="nav-icon">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="nav-text">我的信息</div>
+                </div>
+
+                <div class="nav-item" data-view="advice">
+                    <div class="nav-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="nav-text">管家意见</div>
+                </div>
+            </div>
+
+            <!-- 用户切换按钮 -->
+            <div class="user-switch-btn" id="userSwitchBtn">
+                <i class="fas fa-sync-alt"></i>
+            </div>
+
+            <!-- 用户切换菜单 -->
+            <div class="user-switch-menu" id="userSwitchMenu">
+                <div class="switch-user-item">
+                    <i class="fas fa-user"></i> 用户一
+                </div>
+                <div class="switch-user-item">
+                    <i class="fas fa-user"></i> 用户二
+                </div>
+                <div class="switch-user-item">
+                    <i class="fas fa-user-plus"></i> 添加用户
+                </div>
+                <div class="switch-user-item">
+                    <i class="fas fa-sign-out-alt"></i> 退出登录
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧内容区域 -->
+        <div class="content-area">
+            <div class="content-header">
+                <h1 class="content-title">
+                    <i class="fas fa-comments"></i> 对话
+                </h1>
+                <p class="content-subtitle">与智能助手交流，获取帮助与建议</p>
+            </div>
+
+            <div class="content-card">
+                <h2 class="card-title">用户切换按钮位置说明</h2>
+                <p>根据屏幕宽度不同，用户切换按钮的位置会发生变化：</p>
+                <ul style="margin: 15px 0 15px 25px;">
+                    <li><strong>大屏幕 (≥1200px)</strong>：按钮固定在左下角</li>
+                    <li><strong>中等屏幕 (768px-1199px)</strong>：按钮在导航栏底部居中</li>
+                    <li><strong>小屏幕 (≤768px)</strong>：按钮在右上角</li>
+                </ul>
+                <p>请尝试调整浏览器窗口大小来查看效果。</p>
+            </div>
+
+            <div class="content-card">
+                <h2 class="card-title">心理测试</h2>
+                <p>我们提供专业的心理测试服务，帮助您更好地了解自己。测试内容包括：</p>
+                <ul style="margin: 15px 0 15px 25px;">
+                    <li>个性特征测试</li>
+                    <li>情绪状态评估</li>
+                    <li>职业倾向测试</li>
+                    <li>人际关系分析</li>
+                </ul>
+                <button class="login-btn" style="max-width: 200px; padding: 10px;">
+                    开始测试 <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <div class="content-card">
+                <h2 class="card-title">最近对话</h2>
+                <div style="background: #f9f9ff; border-radius: 12px; padding: 15px; margin: 10px 0;">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <div
+                            style="width: 36px; height: 36px; background: #6e8efb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                            <i class="fas fa-user" style="color: white;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 500;">我: 最近感到压力很大怎么办？</div>
+                            <div style="font-size: 13px; color: #888;">今天 10:23</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <div
+                            style="width: 36px; height: 36px; background: #a777e3; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                            <i class="fas fa-robot" style="color: white;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 500;">智能助手: 建议您尝试深呼吸练习，每天安排15分钟冥想...</div>
+                            <div style="font-size: 13px; color: #888;">今天 10:25</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="screen-size-indicator" id="sizeIndicator"></div> -->
+
+    <script>
+        // 测试
+        document.getElementById('loginContainer').classList.add('hidden');
+        document.getElementById('mainContainer').classList.add('active');
+        //测试结束
+
+
+
+        // 登录功能
+        document.getElementById('loginBtn').addEventListener('click', function () {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username && password) {
+                // 隐藏登录界面
+                document.getElementById('loginContainer').classList.add('hidden');
+
+                // 显示主界面（延迟显示以展示动画）
+                setTimeout(() => {
+                    document.getElementById('mainContainer').classList.add('active');
+                }, 300);
+            } else {
+                alert('请输入用户名和密码');
+            }
+        });
+
+        // 导航菜单功能
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function () {
+                // 移除所有active类
+                navItems.forEach(nav => nav.classList.remove('active'));
+                // 添加active类到当前项
+                this.classList.add('active');
+
+                // 更新内容区域标题
+                const view = this.getAttribute('data-view');
+                const contentTitle = document.querySelector('.content-title');
+                const contentSubtitle = document.querySelector('.content-subtitle');
+
+                switch (view) {
+                    case 'chat':
+                        contentTitle.innerHTML = '<i class="fas fa-comments"></i> 对话';
+                        contentSubtitle.textContent = '与智能助手交流，获取帮助与建议';
+                        break;
+                    case 'test':
+                        contentTitle.innerHTML = '<i class="fas fa-brain"></i> 心理测试';
+                        contentSubtitle.textContent = '通过专业测试了解自己的心理状态';
+                        break;
+                    case 'info':
+                        contentTitle.innerHTML = '<i class="fas fa-user-circle"></i> 我的信息';
+                        contentSubtitle.textContent = '查看和管理您的个人信息';
+                        break;
+                    case 'advice':
+                        contentTitle.innerHTML = '<i class="fas fa-lightbulb"></i> 管家意见';
+                        contentSubtitle.textContent = '获取个性化建议和行动计划';
+                        break;
+                }
+            });
+        });
+
+        // 用户切换功能
+        const userSwitchBtn = document.getElementById('userSwitchBtn');
+        const userSwitchMenu = document.getElementById('userSwitchMenu');
+
+        userSwitchBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            userSwitchMenu.classList.toggle('active');
+        });
+
+        // 点击页面其他区域关闭用户切换菜单
+        document.addEventListener('click', function (e) {
+            if (userSwitchMenu.classList.contains('active')) {
+                userSwitchMenu.classList.remove('active');
+            }
+        });
+
+        // 阻止菜单点击事件冒泡
+        userSwitchMenu.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
+        // 屏幕尺寸指示器
+        function updateSizeIndicator() {
+            const width = window.innerWidth;
+            let size = '';
+
+            if (width >= 1200) {
+                size = '大屏幕 (≥1200px) - 按钮在左下角';
+            } else if (width >= 768) {
+                size = '中等屏幕 (768px-1199px) - 按钮在底部居中';
+            } else {
+                size = '小屏幕 (≤768px) - 按钮在右上角';
+            }
+
+            document.getElementById('sizeIndicator').textContent =
+                `当前屏幕宽度: ${width}px - ${size}`;
+        }
+
+        window.addEventListener('resize', updateSizeIndicator);
+        updateSizeIndicator();
+    </script>
+</body>
+
+</html>

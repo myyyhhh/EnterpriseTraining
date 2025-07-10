@@ -1,0 +1,50 @@
+ /* 全局样式重置 */
+ * {
+     margin: 0;
+     /* 清除所有元素默认外边距 */
+     padding: 0;
+     /* 清除所有元素默认内边距 */
+     box-sizing: border-box;
+     /* 盒模型设置为border-box，确保内边距和边框不增加元素总宽度 */
+     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+     /* 全局字体设置 */
+ }
+:root {
+    /* color */
+    --primary-color: #3a7bd5;
+    --secondary-color: #00d2ff;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --success-color: #4cc9f0;
+    --danger-color: #f72585;
+    --warning-color: #f8961e;
+    --border-radius-1: 20px; /* 圆角大小1*/
+    --border-radius-2: 10px; /* 圆角大小2*/
+    --border-radius-3: 5px; /* 圆角大小3*/
+    --login-container-backgroud-color: #3a7bd590;
+    --login-form-backgroud-color: #00d2ff80;
+
+    --login-font-color: #fff;
+
+    --message-self-backgroud-color: #00d2ff80;
+    --message-other-backgroud-color:#3a7bd580;
+    
+}
+
+ /* 页面主体样式 */
+ body {
+     background: linear-gradient(135deg, #84fab0, #8fd3f4, #84fab0);
+     /* 背景使用渐变色 */
+     min-height: 100vh;
+     /* 最小高度为视口高度，确保页面占满屏幕 */
+     display: flex;
+     /* 使用flex布局 */
+     justify-content: center;
+     /* 水平居中 */
+     align-items: center;
+     /* 垂直居中 */
+     padding: 20px;
+     /* 页面内边距 */
+ }
+
+ 

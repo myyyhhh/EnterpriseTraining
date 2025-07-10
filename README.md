@@ -37,13 +37,19 @@ ai将对话内容整理成
 
 # 项目结构
 
+- api/:
+  - 通常用于存放与 API 相关的文件和逻辑。
+  - FastAPI 项目会把路由、视图、控制器等放在这里。这一文件夹内可以包含处理不同业务逻辑的子模块。
+- data/:
+  - 与数据相关的逻辑和操作
+- service/：
+  - 服务层
 - static/：静态资源
-- templates/：html模板
-- app.py：主程序
+  - CSS、JavaScript、图片、字体
+- templates/：
+  - html模板
+- main.py：主程序
 
 - sample/: 参考样例，与项目无关
 
 ## 7.9
-
-M：html组件完成
-X：

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React Demo</title>
+
+    <!-- 引入 React 和 ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- 引入 Babel 编译器 -->
+    <script src="https://unpkg.com/@babel/standalone"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      // 切换显示/隐藏文本的组件
+      const ToggleText = () => {
+        const [isVisible, setIsVisible] = React.useState(true);
+
+        const toggleVisibility = () => {
+          setIsVisible(prevState => !prevState);
+        };
+
+        return (
+          <div>
+            <button onClick={toggleVisibility}>
+              {isVisible ? '隐藏' : '显示'} 文本
+            </button>
+            {isVisible && <p>这里是要显示的文本！</p>}
+          </div>
+        );
+      };
+
+      // 颜色选择器组件
+      const ColorPicker = () => {
+        const [color, setColor] = React.useState('#ffffff');
+
+        const handleColorChange = (e) => {
+          setColor(e.target.value);
+        };
+
+        return (
+          <div>
+            <input
+              type="color"
+              value={color}
+              onChange={handleColorChange}
+            />
+            <div
+              style={{
+                width: '100px',
+                height: '100px',
+                backgroundColor: color,
+                marginTop: '10px'
+              }}
+            >
+              颜色预览
+            </div>
+          </div>
+        );
+      };
+
+      // 简单任务列表组件
+      const TaskList = () => {
+        const [task, setTask] = React.useState('');
+        const [tasks, setTasks] = React.useState([]);
+
+        const handleTaskChange = (e) => {
+          setTask(e.target.value);
+        };
+
+        const handleAddTask = () => {
+          if (task) {
+            setTasks([...tasks, task]);
+            setTask('');
+          }
+        };
+
+        const handleDeleteTask = (index) => {
+          const newTasks = tasks.filter((_, i) => i !== index);
+          setTasks(newTasks);
+        };
+
+        return (
+          <div>
+            <input
+              type="text"
+              value={task}
+              onChange={handleTaskChange}
+              placeholder="添加任务"
+            />
+            <button onClick={handleAddTask}>添加任务</button>
+
+            <ul>
+              {tasks.map((task, index) => (
+                <li key={index}>
+                  {task} 
+                  <button onClick={() => handleDeleteTask(index)}>删除</button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      };
+
+      // 渲染组件到页面
+      ReactDOM.render(
+        <div>
+          <ToggleText />
+          <ColorPicker />
+          <TaskList />
+        </div>,
+        document.getElementById('root')
+      );
+    </script>
+  </body>
+</html>

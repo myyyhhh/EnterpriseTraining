@@ -1,0 +1,31 @@
+/* app-container.css */
+.app-container {
+    width: 100%;
+    max-width: 1200px;
+    height: 90vh;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    display: flex;
+    animation: fadeIn 0.8s ease;
+}
+
+.sidebar {
+    width: 250px;
+    background: linear-gradient(to bottom, #3a7bd5, #00d2ff);
+    color: white;
+    padding: 25px 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    transition: width 0.1s ease;
+}
+
+.content-area {
+    flex: 1;
+    padding: 35px;
+    overflow-y: auto;
+    background: #f0f5ff;
+}
