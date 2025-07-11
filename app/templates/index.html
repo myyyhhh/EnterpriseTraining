@@ -141,7 +141,7 @@
                             </ul>
 
                             <p>核心代码片段：</p>
-                            <pre
+                            <!-- <pre
                                 style="background: #2c3e50; color: #ecf0f1; padding: 20px; border-radius: 10px; margin: 20px 0;">
                             // 获取DOM元素
                             const userInfo = document.getElementById('userInfo');
@@ -162,7 +162,7 @@
                             userSwitchMenu.addEventListener('click', function(e) {
                                 e.stopPropagation();
                             });
-                        </pre>
+                        </pre> -->
                         </div>
                     </div>
 
@@ -287,16 +287,25 @@
 
             <div class="the-psychological-test content-page" data-view="test">
                 <div class="content-header">
-
+                    <h1 class="content-title">
+                        <i class="fas fa-users-cog"></i> 心理测试
+                    </h1>
+                    <p class="content-subtitle">为你做一个心理测试</p>
                 </div>
+
+
                 <div class="content-body">
+
 
                 </div>
             </div>
 
             <div class="the-my-info content-page" data-view="profile">
                 <div class="content-header">
-
+                    <h1 class="content-title">
+                        <i class="fas fa-users-cog"></i> 我的信息
+                    </h1>
+                    <p class="content-subtitle">我的信息概览</p>
                 </div>
                 <div class="content-body">
 
@@ -305,7 +314,10 @@
             <div class="the-advice content-page" data-view="advice">
 
                 <div class="content-header">
-
+                    <h1 class="content-title">
+                        <i class="fas fa-users-cog"></i> 管家意见
+                    </h1>
+                    <p class="content-subtitle">管家意见汇总</p>
                 </div>
                 <div class="content-body">
 
@@ -440,7 +452,7 @@
         appContainer.style.display = 'flex';
         loginContainer.style.display = 'none';
 
-        switchView('home');
+        switchView('test');
 
     </script>
 </body>
