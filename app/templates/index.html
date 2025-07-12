@@ -12,23 +12,7 @@
         /* index.css */
     </style>
 </head>
-
 <body>
-    <div class="login-container" id="loginContainer">
-        <div class="login-form">
-            <h2>登录聊天系统</h2>
-            <div class="form-group">
-                <label for="inputUsername">用户名</label>
-                <input type="text" id="inputUsername" placeholder="输入用户名">
-            </div>
-            <div class="form-group">
-                <label for="inputPassword">密码</label>
-                <input type="password" id="inputPassword" placeholder="输入密码">
-            </div>
-            <button class="btn btn-login" id="loginBtn">登录</button>
-        </div>
-    </div>
-
     <div class="app-container" id="app-container">
         <!-- 左侧导航 -->
         <div class="sidebar" id="sidebar">
@@ -335,32 +319,32 @@
         const userInfo = document.getElementById('userInfo');    //用户信息区域
         const userSwitchMenu = document.getElementById('userSwitchMenu');    //用户切换菜单
         const switchItems = document.querySelectorAll('.switch-user-item');  //用户切换菜单项
-        const loginBtn = document.getElementById('loginBtn');
-        const loginContainer = document.getElementById('loginContainer');
-        const username = document.getElementById('inputUsername');
-        const password = document.getElementById('inputPassword');
+        // const loginBtn = document.getElementById('loginBtn');
+        // const loginContainer = document.getElementById('loginContainer');
+        // const username = document.getElementById('inputUsername');
+        // const password = document.getElementById('inputPassword');
         const appContainer = document.getElementById('app-container');
 
-        //==============登录==========================
+        // //==============登录==========================
 
-        // 登录按钮点击事件
-        loginBtn.addEventListener(
-            'click',
-            function () {
-                const usernameVal = username.value.trim();
-                const passwordVal = password.value.trim();
-                if (true) {/*right*/
-                    getLogin();
-                } else {
-                    alert('用户名或密码错误，请重新输入！');
-                }
-            }
-        );
+        // // 登录按钮点击事件
+        // loginBtn.addEventListener(
+        //     'click',
+        //     function () {
+        //         const usernameVal = username.value.trim();
+        //         const passwordVal = password.value.trim();
+        //         if (true) {/*right*/
+        //             getLogin();
+        //         } else {
+        //             alert('用户名或密码错误，请重新输入！');
+        //         }
+        //     }
+        // );
 
-        function getLogin() {
-            appContainer.style.display = 'flex';
-            loginContainer.style.display = 'none';
-        }
+        // function getLogin() {
+        //     appContainer.style.display = 'flex';
+        //     loginContainer.style.display = 'none';
+        // }
 
 
         //===========主界面===========================
@@ -448,11 +432,10 @@
             });
         });
 
-        //============初始化==============
+        //============初始化=============        
         appContainer.style.display = 'flex';
-        loginContainer.style.display = 'none';
 
-        switchView('test');
+        switchView('home');
 
     </script>
 </body>
