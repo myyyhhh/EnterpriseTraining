@@ -48,7 +48,9 @@ class Advice(BaseModel):
     content: str
 
 
-
+# class User(BaseModel):
+#     username: str
+#     password: str
 
 
 class UserAccountInfo(BaseModel):
@@ -117,6 +119,8 @@ def get_user(user_info: dict)->Optional[User]:
     return User(user_account_info=user_account_info, user_based_info=user_based_info, user_habit_info=user_habit_info, user_psychology=user_psychology)
 
 
+
+
 # 内存中读取心理测试题目
 
 def get_psychology_questions():
@@ -138,11 +142,12 @@ users_db: Dict[str, User] = {}
 active_users: Dict[str, str] = {}  # session_id: username
 
 # 对话历史
-chat_history: Dict[str, List[Dict[str, str]]] = {}  # username: [message1, message2,...]
+chat_history: dict[str, List[Dict[str, str]]] = {}  # username: [message1, message2,...]
 """
 user: [sender, message, time]
 示例
-chat_history = {
+chat_history = 
+{
     "user1": [
         {"sender": "user1", "message": "hello", "time": "刚刚"},
         {"sender": "user2", "message": "hi", "time": "1分钟前"}
@@ -151,16 +156,20 @@ chat_history = {
         {"sender": "user2", "message": "how are you", "time": "2分钟前"}
     ]
 }
+
+
+sender: human or ai or system
 """
 
 
 # 当前用户信息
-my_info:User
+ccurrent_uesr:User
 
 # 建议
 advice: Dict[str, Advice]
 
 #=========================功能函数==============================
+
 
 
 # 获取当前用户
@@ -307,7 +316,8 @@ async def home(request: Request, current_user: Optional[User] = Depends(get_curr
     return templates.TemplateResponse("index.html", {
         "request": request,
         "current_user": current_user,
-        "all_users": all_users
+        "all_users": all_users,
+        "chat_history": chat_history,
     })
 
 
@@ -474,8 +484,76 @@ async def get_users(current_user: Optional[User] = Depends(get_current_user)):
 
 
 
+# 项目测试模块
+
+def test_init():
+    # 全局变量初始化
+    global users_db, active_users, chat_history, advice
+    users_db = {}
+    active_users = {
+
+    }
+    chat_history = {
+        "123": [
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "12:23:22"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "12:23:22"},
+        ],
+        "user2": [
+            {"sender": "user2", "message": "how are you", "time": "2分钟前"}
+        ]
+    }
+    # ccurrent_uesr = User(username="admin", password="password")
+    advice = {
+        "1": Advice(advice="减肥", content="减肥可以缓解疲劳、减少体重、改善睡眠质量、改善心情、减少心脏病发作风险。"),
+        "2": Advice(advice="锻炼", content="锻炼可以改善身体机能、减少疲劳、改善睡眠质量、改善心情、减少心脏病发作风险。"),
+        "3": Advice(advice="改善睡眠", content="改善睡眠可以改善身体机能、减少疲劳、改善睡眠质量、改善心情、减少心脏病发作风险。"),
+        "4": Advice(advice="减少运动", content="减少运动可以改善身体机能、减少疲劳、改善睡眠质量、改善心情、减少心脏病发作风险。"),
+        "5": Advice(advice="改善心情", content="改善心情可以改善身体机能、减少疲劳、改善睡眠质量、改善心情、减少心脏病发作风险。"),
+    }
+
+
+
+# init
+test_init()
+
+chat_history[ccurrent_uesr.username].append()
+
+
+
+
+
+
+
+
+
+
 # 启动应用
 if __name__ == "__main__":
+
+
     print("启动应用")
     import uvicorn
     uvicorn.run(app="app.main:app", host="127.0.0.1", port=8080,reload=True)
+    
