@@ -292,7 +292,10 @@
                     <p class="content-subtitle">我的信息概览</p>
                 </div>
                 <div class="content-body">
+                    {% if current_user.is_authenticated %}
 
+                        
+                    {% end if %}
                 </div>
             </div>
             <div class="the-advice content-page" data-view="advice">

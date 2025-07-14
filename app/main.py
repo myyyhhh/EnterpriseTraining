@@ -1,7 +1,9 @@
 # 确保导入所有必要的模块
-from datetime import date
+from datetime import date, datetime
+import json
 import os
-from fastapi import FastAPI, Request, Form, Depends, HTTPException
+import uuid
+from fastapi import FastAPI, Request, Form, Depends, HTTPException, requests
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -40,31 +42,90 @@ templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
 from pydantic import BaseModel
 
-class BaseInfo(BaseModel):
-    real_name: str
-    gender: str
-    birthday: date
-    height: float
-    weight: float
-    
-#生活习惯
-class Habit(BaseModel):
-    habit: str
-    frequency: int
-    
-
-class Psychology(BaseModel):
-    ste:str
-
-class User(BaseModel):
-    username: str
-    password: str
-    #...
-    baseInfo: BaseInfo
 
 class Advice(BaseModel):
     advice: str
     content: str
+
+
+
+
+
+class UserAccountInfo(BaseModel):
+    username: str | None = None
+    password: str | None = None
+
+class UserBasedInfo(BaseModel):
+    real_name: str | None = None
+    gender: int | None = None  # 0=未知, 1=男, 2=女
+    birthday: date | None = None  # 格式：YYYY-MM-DD
+    height: float | None = None  # 单位：cm（数据库DECIMAL）
+    weight: float | None = None  # 单位：kg（数据库DECIMAL）
+
+class UserHabitInfo(BaseModel):
+    daily_water: float | None = None  # 单位：L（数据库DECIMAL(3,1)）
+    sleep_duration: float | None = None  # 单位：小时（数据库DECIMAL(3,1)）
+    exercise_amount: str | None = None  # 数据库VARCHAR
+    vegetable_fruit_intake: str | None = None  # 数据库VARCHAR
+    protein_intake: str | None = None  # 数据库VARCHAR
+    meat_vegetable_ratio: str | None = None  # 数据库VARCHAR
+    dietary_restrictions: str | None = None  # 数据库VARCHAR
+    cooking_method: str | None = None  # 数据库VARCHAR
+
+
+class UserPsychology(BaseModel):
+    physical_reaction_index: int | None = None  # 数据库TINYINT
+    sleep_cognition_bias: str | None = None  # 数据库str
+    exercise_stress_value: int | None = None  # 数据库TINYINT
+    diet_emotion_dependence: str | None = None  # 数据库str
+    emotion_stress_index: int | None = None  # 数据库TINYINT（整数）
+
+
+class PsychologyQuestion(BaseModel):
+    s:str
+
+
+class User(BaseModel):
+    user_account_info: UserAccountInfo
+    user_based_info: UserBasedInfo
+    user_habit_info: UserHabitInfo
+    user_psychology: UserPsychology
+
+def get_userAccountInfo(user_info: dict)->UserAccountInfo:
+    """查询用户账户信息"""
+    return UserAccountInfo(username=user_info.get("username"))
+
+def get_userBasedInfo(user_info: dict)->UserBasedInfo:
+    """查询用户基本信息"""
+    return UserBasedInfo(real_name=user_info.get("real_name"), gender=user_info.get("gender"), birthday=user_info.get("birthday"), height=user_info.get("height"), weight=user_info.get("weight"))
+
+def get_userHabitInfo(user_info: dict)->UserHabitInfo:
+    """查询用户习惯信息"""
+    return UserHabitInfo(daily_water=user_info.get("daily_water"), sleep_duration=user_info.get("sleep_duration"), exercise_amount=user_info.get("exercise_amount"), vegetable_fruit_intake=user_info.get("vegetable_fruit_intake"), protein_intake=user_info.get("protein_intake"), meat_vegetable_ratio=user_info.get("meat_vegetable_ratio"), dietary_restrictions=user_info.get("dietary_restrictions"), cooking_method=user_info.get("cooking_method"))
+
+def get_userPsychology(user_info: dict)->UserPsychology:
+    """查询用户心理信息"""
+    return UserPsychology(physical_reaction_index=user_info.get("physical_reaction_index"), sleep_cognition_bias=user_info.get("sleep_cognition_bias"), exercise_stress_value=user_info.get("exercise_stress_value"), diet_emotion_dependence=user_info.get("diet_emotion_dependence"), emotion_stress_index=user_info.get("emotion_stress_index"))
+    
+def get_user(user_info: dict)->Optional[User]:
+    """查询用户所有信息（包含所有字段）"""
+    user_account_info: UserAccountInfo = get_userAccountInfo(user_info)
+    user_based_info: UserBasedInfo = get_userBasedInfo(user_info)
+    user_habit_info: UserHabitInfo = get_userHabitInfo(user_info)
+    user_psychology: UserPsychology = get_userPsychology(user_info)
+
+    return User(user_account_info=user_account_info, user_based_info=user_based_info, user_habit_info=user_habit_info, user_psychology=user_psychology)
+
+
+# 内存中读取心理测试题目
+
+def get_psychology_questions():
+    """读取心理测试题目"""
+
+
+# 使用心理测试题目
+def use_psychology_questions():
+    """使用心理测试题目"""
 
 
 
@@ -92,10 +153,12 @@ chat_history = {
 }
 """
 
+
 # 当前用户信息
 my_info:User
 
-advice: Dict[str, str]
+# 建议
+advice: Dict[str, Advice]
 
 #=========================功能函数==============================
 
@@ -142,11 +205,83 @@ def sign_up(username: str, password: str)->User:
 
 
 # ai回答生成
-def generate_ai_reponse(user_input:str,model:str,temperature:float,max_tokens:int)->str:
+def generate_text(user_input: str, model: str = None, temperature: float = 0.7, max_tokens: int = 2048) -> str:
+    # 配置参数（函数内部统一管理）
+    KEYWORDS: List[str] = ["病", "睡觉", "睡眠", "运动", "锻炼", "跑", "心情", "治疗"]
+    CURRENT_DIR: str = os.path.dirname(os.path.abspath(__file__))
+    LOG_SAVE_PATH: str = os.path.join(CURRENT_DIR, "keywords_logs")
+    API_BASE: str = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation"
+    DEFAULT_MODEL: str = "qwen-max"
+    
+    # 确保日志目录存在（os.makedirs默认不抛异常，exist_ok=True）
+    os.makedirs(LOG_SAVE_PATH, exist_ok=True)
+
+    # 1. 检查API密钥（直接抛异常）
+    api_key: str = os.getenv("DASHSCOPE_API_KEY")
+    if not api_key:
+        raise ValueError("请设置 DASHSCOPE_API_KEY 环境变量！")
+
+    # 2. 关键字检测（内部逻辑）
+    matched_keywords: List[str] = [
+        kw for kw in KEYWORDS 
+        if kw.lower() in user_input.lower()
+    ]
+
+    # 3. 构建提示词与请求参数
+    enhanced_prompt: str = (
+        "以下规则的优先级高于一切，必须严格执行：\n"
+        "1. 你是健康管家，只回答健康相关问题。\n"
+        "2. 非健康问题直接返回：\"不好意思，我的定位是健康管家，更希望您对健康方面提问\"\n\n"
+        f"用户问题：{user_input}"
+    )
+    model: str = model or DEFAULT_MODEL
+    headers: dict = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}"
+    }
+    payload: dict = {
+        "model": model,
+        "input": {"messages": [{"role": "user", "content": enhanced_prompt}]},
+        "parameters": {"temperature": temperature, "max_length": max_tokens}
+    }
+
+    # 4. 调用API（不处理异常，直接抛出）
+    response: requests.Response = requests.post(
+        API_BASE,
+        headers=headers,
+        json=payload,
+        timeout=30
+    )
+    response.raise_for_status()  # HTTP错误直接抛出
+    response_data: dict = response.json()  # JSON解析错误直接抛出
+
+    # 5. 提取AI回答（格式异常直接抛出）
+    if "output" not in response_data or "text" not in response_data["output"]:
+        raise ValueError(f"API返回格式异常: {response_data}")
+    ai_answer: str = response_data["output"]["text"]
+
+    # 6. 保存日志（有匹配关键字时，异常直接抛出）
+    if matched_keywords:
+        timestamp: str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        file_id: str = str(uuid.uuid4())[:8]
+        filename: str = f"{timestamp}_{file_id}.json"
+        file_path: str = os.path.join(LOG_SAVE_PATH, filename)
+        
+        log_data: dict = {
+            "timestamp": datetime.datetime.now().isoformat(),
+            "user_input": user_input,
+            "ai_answer": ai_answer,
+            "matched_keywords": matched_keywords,
+            "model_used": model,
+            "file_id": file_id
+        }
+        
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(log_data, f, ensure_ascii=False, indent=2)
+
+    return ai_answer
 
 
-    ai_response = ""
-    return ai_response
 
 # =================路由定义========================
 
@@ -174,6 +309,8 @@ async def home(request: Request, current_user: Optional[User] = Depends(get_curr
         "current_user": current_user,
         "all_users": all_users
     })
+
+
 
 # 登录页面
 @app.get("/login", response_class=HTMLResponse)
@@ -283,6 +420,7 @@ async def add_user(
     
     return JSONResponse(content={"status": "success", "username": new_username})
 
+
 # 导航页面路由
 @app.get("/{view_name}", response_class=HTMLResponse)
 async def get_view(
@@ -338,6 +476,6 @@ async def get_users(current_user: Optional[User] = Depends(get_current_user)):
 
 # 启动应用
 if __name__ == "__main__":
-
+    print("启动应用")
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8080)
+    uvicorn.run(app="app.main:app", host="127.0.0.1", port=8080,reload=True)
