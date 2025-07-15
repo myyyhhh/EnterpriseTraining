@@ -302,6 +302,7 @@ current_user:User
 advice: Dict[str, Advice]
 
 data = load_psychology_assessment(json_path="app\\static\\mental_health_assessment.json")
+
 test = assessment_data2BaseModels(assessment_data=data)
 
 
@@ -525,6 +526,108 @@ def generate_text(
 
     return ai_answer, chat_history  # 返回AI回答和更新后的对话历史
 
+# ai询问
+def subjection(user_info: User) -> str:
+    """根据用户信息生成健康建议"""
+    API_BASE: str = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation"
+    API_KEY = os.getenv("DASHSCOPE_API_KEY")
+    
+    if not API_KEY:
+        raise ValueError("请设置DASH_API_KEY环境变量")
+    
+    # 构建提示词
+    prompt = build_prompt(user_info)
+    
+    # 调用API
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {API_KEY}"
+    }
+    
+    payload = {
+        "model": "qwen-max",
+        "input": {
+            "prompt": prompt
+        },
+        "parameters": {
+            "temperature": 0.3,
+            "top_p": 0.8
+        }
+    }
+    
+    try:
+        response = requests.post(API_BASE, headers=headers, data=json.dumps(payload))
+        response.raise_for_status()
+        result = response.json()
+        
+        # 提取生成的文本
+        if "output" in result and "text" in result["output"]:
+            return result["output"]["text"]
+        else:
+            return "抱歉，未能生成健康建议。"
+    except requests.exceptions.RequestException as e:
+        return f"API请求错误: {str(e)}"
+
+
+# 提示词生成
+def build_prompt(user_info: User) -> str:
+    """构建向API发送的提示词"""
+    # 确定称呼
+    gender_title = ""
+    if user_info.user_based_info.gender == 1:
+        gender_title = "先生"
+    elif user_info.user_based_info.gender == 2:
+        gender_title = "女士"
+    else:
+        gender_title = "朋友"
+    
+    name = user_info.user_based_info.real_name or user_info.user_account_info.username or "佚名"
+    
+    # 基本信息部分
+    base_info = ""
+    if user_info.user_based_info.height and user_info.user_based_info.weight:
+        bmi = user_info.user_based_info.weight / ((user_info.user_based_info.height / 100) ** 2)
+        base_info += f"您的身高是{user_info.user_based_info.height}cm，体重是{user_info.user_based_info.weight}kg，BMI为{round(bmi, 1)}。"
+    
+    # 健康习惯部分
+    habit_info = ""
+    if user_info.user_habit_info.daily_water:
+        habit_info += f"您目前每天饮水量为{user_info.user_habit_info.daily_water}L。"
+    if user_info.user_habit_info.sleep_duration:
+        habit_info += f"睡眠时间为{user_info.user_habit_info.sleep_duration}小时。"
+    if user_info.user_habit_info.exercise_amount:
+        habit_info += f"运动频率为{user_info.user_habit_info.exercise_amount}。"
+    
+    # 饮食习惯部分
+    diet_info = ""
+    if user_info.user_habit_info.vegetable_fruit_intake:
+        diet_info += f"果蔬摄入量为{user_info.user_habit_info.vegetable_fruit_intake}。"
+    if user_info.user_habit_info.protein_intake:
+        diet_info += f"蛋白质摄入量为{user_info.user_habit_info.protein_intake}。"
+    if user_info.user_habit_info.meat_vegetable_ratio:
+        diet_info += f"肉菜比例为{user_info.user_habit_info.meat_vegetable_ratio}。"
+    if user_info.user_habit_info.dietary_restrictions:
+        diet_info += f"饮食禁忌为{user_info.user_habit_info.dietary_restrictions}。"
+    
+    # 心理状态部分
+    psychology_info = ""
+    if user_info.user_psychology.emotion_stress_index:
+        psychology_info += f"您的情绪压力指数为{user_info.user_psychology.emotion_stress_index}。"
+    if user_info.user_psychology.physical_reaction_index:
+        psychology_info += f"身体反应指数为{user_info.user_psychology.physical_reaction_index}。"
+    
+    # 构建完整提示词
+    prompt = f"""
+{name}{gender_title}，作为您的健康管家，根据您的个人信息，我为您给出如下健康建议：
+
+1. 根据健康指标：{base_info}{habit_info}
+2. 根据饮食指标：{diet_info}
+3. 根据心理指标：{psychology_info}
+
+请提供具体的健康建议，分点列出，语言简洁明了，具有可操作性。
+"""
+    
+    return prompt.strip()
 
 
 # =================路由定义========================
@@ -739,7 +842,121 @@ async def get_users(current_user: Optional[User] = Depends(get_current_user)):
     
     return [user.dict() for user in users_db.values()]
 
+# 心理测试提交路由
+@app.post("/submit-test")
+async def submit_test(
+    request: Request,
+    current_user: Optional[User] = Depends(get_current_user)
+):
+    print("in test submit======================")
 
+    global test
+
+    if not current_user:
+        raise HTTPException(status_code=401, detail="未登录")
+    
+    # 解析请求数据
+    data = await request.json()
+    answers = data.get('answers', {})
+
+    # print(answers)
+    
+    if not answers:
+        return JSONResponse(
+            content={"status": "error", "message": "未提交任何答案"},
+            status_code=400
+        )
+    # ----------------------------------------------------------------
+    cleaned_answers = {}
+    for key, value in answers.items():
+        cleaned_key = key.replace(" ", "").replace("　", "")
+        cleaned_answers[cleaned_key] = value
+
+    results = []
+    
+    # 遍历每个评估维度
+    for dimension in test.dimensions:
+        dim_name = dimension.name
+        # dim_name = dimension["name"]
+        total_score = 0
+        
+        # 计算当前维度总分
+        for question in dimension.questions:
+            answer_key = f"{dim_name}-{question.id}".replace(" ", "")
+            if answer_key in cleaned_answers:
+                total_score += cleaned_answers[answer_key]["score"]
+        
+        # 获取对应分数段的评估建议
+        assessment = ""
+        suggestion = ""
+        for score_range in dimension.ranges:
+            if score_range.min <= total_score <= score_range.max:
+                assessment = score_range.assessment
+                suggestion = score_range.suggestion
+                break
+        
+        # 添加到结果集
+        results.append({
+            "dimension": dim_name,
+            "score": total_score,
+            "assessment": assessment,
+            "suggestion": suggestion
+        })
+
+    # print(results)
+
+    return JSONResponse(content={
+        "status": "success",
+        "results": results
+    })
+
+    # return {"status": "success", "results": results}
+    # # 计算每个维度的得分
+    # dimension_scores = {}
+    # for question_id, answer in answers.items():
+    #     dimension = answer['dimension']
+    #     score = answer['score']
+    #     if dimension not in dimension_scores:
+    #         dimension_scores[dimension] = 0
+    #     dimension_scores[dimension] += score
+    # # 准备维度结果
+    # dimension_results = []
+    # for dimension_name, score in dimension_scores.items():
+    #     # 找到对应的维度配置
+    #     dimension_config = None
+    #     for dim in test.dimensions:
+    #         if dim.name == dimension_name:
+    #             dimension_config = dim
+    #             break 
+    #     if not dimension_config:
+    #         continue  
+    #     # 查找对应的评分范围
+    #     assessment = "未知"
+    #     suggestion = "无建议"
+    #     for range_config in dimension_config.ranges:
+    #         if range_config.min <= score <= range_config.max:
+    #             assessment = range_config.assessment
+    #             suggestion = range_config.suggestion
+    #             break
+    #     dimension_results.append({
+    #         "dimension": dimension_name,
+    #         "score": score,
+    #         "assessment": assessment,
+    #         "suggestion": suggestion
+    #     })
+    # # 计算总体评估（简单平均）
+    # total_score = sum(score for score in dimension_scores.values())
+    # average_score = total_score / len(dimension_scores) if dimension_scores else 0
+    # # 根据平均分给出总体评估和建议
+    # overall_assessment, overall_suggestion = get_overall_assessment(average_score)    
+    # # 这里可以保存测试结果到数据库
+    # # save_test_results(current_user.username, dimension_results, overall_assessment, overall_suggestion)    
+    # return JSONResponse(content={
+    #     "status": "success",
+    #     "dimension_results": dimension_results,
+    #     "overall_assessment": overall_assessment,
+    #     "overall_suggestion": overall_suggestion
+    # })
 
 # 项目测试模块
 

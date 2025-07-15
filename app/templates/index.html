@@ -7,7 +7,8 @@
     <title>智能助手 - 用户切换功能</title>
     <!-- 图标库导入 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="../static/index.css">
+    <link rel="stylesheet" type="text/css" href="../static/CSS/index.css">
+
     <style>
         /* index.css */
     </style>
@@ -312,10 +313,119 @@
                         <i class="fas fa-brain"></i> {{ test.title }}
                     </h1>
                     <p class="content-subtitle">完成以下测试，获取专业心理评估报告</p>
+
                 </div>
-
+                <div class="progress-container" id="progress-container" style="display: none;">
+                    <div class="progress-header">
+                        <span>测试进度</span>
+                        <span id="progress-text">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
                 <div class="content-body">
+                    <div class="test-intro" id="testIntro">
+                        <div class="test-welcome">
+                            <h2>欢迎参加心理测评</h2>
+                            <p>本测评将从多个维度评估您的心理状态，帮助您更好地了解自己。</p>
+                            <p>请根据您的真实情况进行选择，测评结果仅用于自我了解。</p>
+                            <button id="start-test-btn" class="start-btn">
+                                <i class="fas fa-play"></i> 开始测试
+                            </button>
+                        </div>
+                    </div>
 
+                    <div class="test-container" id="testContainer" style="display: none;">
+                        <!-- <div class="progress-container" id="progress-container">
+                            <div class="progress-header">
+                                <span>测试进度</span>
+                                <span id="progress-text">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                        </div> -->
+
+                        <form id="psychology-test-form" id="psychology-test-form">
+                            {% for dimension in test.dimensions %}
+                            <div class="dimension-card" data-dimension="{{ dimension.name }}">
+                                <div class="dimension-header">
+                                    <div class="dimension-icon">
+                                        <i class="fas fa-chart-pie"></i>
+                                    </div>
+                                    <div class="dimension-title">
+                                        <h3>{{ dimension.name }}</h3>
+                                        <p>请根据您的真实情况选择最符合的选项</p>
+                                    </div>
+                                </div>
+
+                                {% for question in dimension.questions %}
+                                <div class="question-card" data-question-id="{{ question.id }}">
+                                    <div class="question-header">
+                                        {{ question.id }}. {{ question.content }}
+                                    </div>
+                                    <div class="options-container">
+                                        {% for option in question.options %}
+                                        <div class="option-item" data-score="{{ option.score }}">
+                                            <div class="option-letter">{{ option.option }}</div>
+                                            <div class="option-text">{{ option.text }}</div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+
+                                <!-- <table class="scoring-table">
+                                    <thead>
+                                        <tr>
+                                            <th>分数范围</th>
+                                            <th>评估结论</th>
+                                            <th>建议</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for range in dimension.ranges %}
+                                        <tr>
+                                            <td>{{ range.min }} - {{ range.max }}分</td>
+                                            <td>{{ range.assessment }}</td>
+                                            <td>{{ range.suggestion }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table> -->
+                            </div>
+                            {% endfor %}
+
+                            <div class="test-submit-area">
+                                <button type="submit" class="submit-btn">
+                                    <i class="fas fa-paper-plane"></i> 提交测试
+                                </button>
+                            </div>
+                        </form>
+
+
+                    </div>
+                    <div class="test-result" id="test-result">
+                        <div class="result-header">
+                            <h3>您的心理测评结果</h3>
+                            <p>基于科学评估的专业分析报告</p>
+                        </div>
+
+                        <div class="result-dimensions" id="dimension-results">
+                            <!-- 各维度结果将由JavaScript动态生成 -->
+                        </div>
+
+                        <!-- <div class="overall-result">
+                            <h4 class="overall-title">综合评估</h4>
+                            <p id="overall-assessment">您的综合评估结果将显示在这里...</p>
+                        </div> -->
+
+                        <!-- <div class="suggestion-box">
+                            <h4><i class="fas fa-lightbulb"></i> 专业建议</h4>
+                            <p id="overall-suggestion">根据您的测试结果，我们提供的专业建议将显示在这里...</p>
+                        </div> -->
+                    </div>
                 </div>
             </div>
 
@@ -348,235 +458,11 @@
         </div>
     </div>
 
+    <script src="../static/script/index_sidebar.js"></script>
+    <script src="../static/script/index_communication.js"></script>
+    <script src="../static/script/index_test.js"></script>
+
     <script>
-
-        //==========DOM元素=================
-
-        const toggleBtn = document.getElementById('toggleBtn'); // 折叠按钮
-        const sidebar = document.getElementById('sidebar');     //侧边栏  
-        const userInfo = document.getElementById('userInfo');    //用户信息区域
-        const userSwitchMenu = document.getElementById('userSwitchMenu');    //用户切换菜单
-        const switchItems = document.querySelectorAll('.switch-user-item');  //用户切换菜单项
-        // const loginBtn = document.getElementById('loginBtn');
-        // const loginContainer = document.getElementById('loginContainer');
-        // const username = document.getElementById('inputUsername');
-        // const password = document.getElementById('inputPassword');
-        const appContainer = document.getElementById('app-container');
-        //===========主界面===========================
-
-        // ------------折叠功能--------------
-
-        toggleBtn.addEventListener('click', function () {
-            sidebar.classList.toggle('collapsed');
-        });
-
-        // -------------用户菜单---------------
-
-        // 用户切换功能（绑定到用户信息区域）
-        userInfo.addEventListener('click', function (e) {
-            // console.log(e);
-            e.stopPropagation();
-            userSwitchMenu.classList.toggle('active');
-        });
-
-
-        //点击页面其他区域关闭菜单
-        document.addEventListener('click', function () {
-            userSwitchMenu.classList.remove('active');
-        });
-
-        //阻止菜单点击事件冒泡
-        userSwitchMenu.addEventListener('click', function (e) {
-            e.stopPropagation();
-        });
-
-
-        // 菜单项点击事件
-        switchItems.forEach(item => {
-            item.addEventListener('click', function () {
-                const userName = this.textContent.trim();
-                if (userName === "添加用户" || userName === "账户设置" || userName === "退出登录") {
-                    alert(`正在执行: ${userName}`);
-                } else {
-                    document.querySelector('.user-name').textContent = userName;
-                    if (userName === "李华") {
-                        document.querySelector('.user-role').textContent = "系统管理员";
-                    } else if (userName === "王芳") {
-                        document.querySelector('.user-role').textContent = "普通会员";
-                    } else {
-                        document.querySelector('.user-role').textContent = "高级会员";
-                    }
-                    alert(`已切换到用户: ${userName}`);
-                }
-                userSwitchMenu.classList.remove('active');
-            });
-        });
-
-        //--------------导航功能--------------
-
-        // 导航项点击事件
-        // 获取DOM元素
-        const navItems = document.querySelectorAll('.nav-item');
-        const contentPages = document.querySelectorAll('.content-page');
-
-        // 导航切换功能
-        function switchView(viewName) {
-            // 更新导航项状态
-            navItems.forEach(item => {
-                if (item.getAttribute('data-view') === viewName) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-
-            // 更新内容页面
-            contentPages.forEach(page => {
-                if (page.getAttribute('data-view') === viewName) {
-                    page.classList.add('active');
-                } else {
-                    page.classList.remove('active');
-                }
-            });
-        }
-
-        // 为每个导航项添加点击事件
-        navItems.forEach(item => {
-            item.addEventListener('click', function () {
-                const viewName = this.getAttribute('data-view');
-                switchView(viewName);
-            });
-        });
-
-        //---------------对话功能-------------------
-
-        const chatHistory = document.getElementById('chatHistory');
-        const inputBox = document.querySelector('.the-communication-input input');
-        const sendBtn = document.querySelector('.the-communication-input button');
-
-        // 滚动到聊天区域底部
-        function scrollToBottom() {
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }
-
-        // 获取DOM元素
-
-
-        // 发送消息函数
-        async function sendMessage() {
-            const message = inputBox.value.trim();
-            if (!message) return; // 空消息不发送
-
-            // 1. 清空输入框
-            inputBox.value = '';
-
-            try {
-                // 2. 发送POST请求到后端
-                const response = await fetch('/send-message', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({ message: message })
-                });
-
-                const data = await response.json();
-                if (data.status === 'success') {
-                    // 3. 动态添加用户消息到界面
-                    addMessageToDOM(data.user_message);
-                    // 4. 动态添加AI回复到界面
-                    addMessageToDOM(data.ai_message);
-                }
-            } catch (error) {
-                console.error('发送失败：', error);
-                addMessageToDOM({
-                    sender: 'system',
-                    message: '消息发送失败，请重试',
-                    time: '刚刚'
-                });
-            }
-        }
-
-        // 动态添加消息到聊天界面
-        function addMessageToDOM(msg) {
-            const div = document.createElement('div');
-            // 根据sender设置样式（匹配前端模板的判断）
-            if (msg.sender === 'human') {
-                div.className = 'message message-self';
-                div.innerHTML = `
-            <div class="message-header">
-                <div class="message-sender">我</div>
-                <div class="message-time">${msg.time}</div>
-            </div>
-            <div class="message-content">${msg.message}</div>
-        `;
-            } else if (msg.sender === 'ai') {
-                div.className = 'message message-other';
-                div.innerHTML = `
-            <div class="message-header">
-                <div class="message-sender">健康管家</div>
-                <div class="message-time">${msg.time}</div>
-            </div>
-            <div class="message-content">${msg.message}</div>
-        `;
-            } else { // system
-                div.className = 'message message-system';
-                div.innerHTML = `<div class="message-content">${msg.message}</div>`;
-            }
-            chatHistory.appendChild(div);
-            // 滚动到底部
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }
-
-        // 绑定发送事件（按钮点击/回车）
-        sendBtn.addEventListener('click', sendMessage);
-        inputBox.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-
-        // 清空聊天记录
-        function clearChat() {
-            if (confirm('确定要清空当前聊天记录吗？')) {
-                const chatHistory = document.getElementById('chatHistory');
-                // 保留系统消息
-                const systemMessage = chatHistory.querySelector('.message-system');
-                chatHistory.innerHTML = '';
-                if (systemMessage) {
-                    chatHistory.appendChild(systemMessage);
-                }
-
-                // 发送清空请求到后端
-                fetch('/clear-chat', { method: 'POST' })
-                    .catch(error => console.error('清空聊天记录错误:', error));
-            }
-        }
-
-        // 事件监听
-        document.addEventListener('DOMContentLoaded', () => {
-            // 滚动到底部
-            scrollToBottom();
-
-            // 发送按钮点击事件
-            document.getElementById('sendButton').addEventListener('click', sendMessage);
-
-            // 输入框回车事件
-            document.getElementById('messageInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-        });
-        // 清空聊天按钮
-        // document.getElementById('clearChatBtn').addEventListener('click', clearChat);
-
-        // 输入框自动聚焦
-        document.getElementById('messageInput').focus();
-
-        // =====================心理测试================
-        // 心理测试功能实现
-
-        // 心理测试核心逻辑
-
         //============初始化=============        
         appContainer.style.display = 'flex';
 
