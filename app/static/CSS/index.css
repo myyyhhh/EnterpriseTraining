@@ -2424,3 +2424,259 @@ app-container
         opacity: 1;
     }
 }
+
+
+/* ==================================个人信息模块======================= */
+/* 个人信息模块容器 */
+.profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 卡片基础样式 */
+.profile-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* 卡片头部样式 */
+.profile-card-header {
+    background-color: #f8f9fa;
+    padding: 20px 25px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.profile-card-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: #2d3436;
+    font-weight: 600;
+}
+
+.profile-card-header p {
+    margin: 5px 0 0;
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+/* 卡片内容区域 */
+.profile-card-body {
+    padding: 25px;
+}
+
+/* 表单样式 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: #fff;
+}
+
+.form-control:disabled {
+    background-color: #f8f9fa;
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-text.text-muted {
+    margin-top: 5px;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* 表单行布局 */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+}
+
+.form-row .form-group {
+    flex: 1;
+    min-width: 200px;
+    padding: 0 10px;
+    margin-bottom: 20px;
+}
+
+/* 文本域样式 */
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+    padding: 12px 15px;
+    line-height: 1.5;
+}
+
+/* 操作按钮区域 */
+.profile-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+    padding: 0 25px 25px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* 消息提示样式 */
+.alert {
+    padding: 15px 20px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-row .form-group {
+        width: 100%;
+        padding: 0;
+        margin-bottom: 15px;
+    }
+
+    .profile-actions {
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+    }
+
+    .profile-card {
+        margin-bottom: 20px;
+    }
+
+    .profile-card-header,
+    .profile-card-body {
+        padding: 15px 20px;
+    }
+}
+
+/* 修复文字与背景的对比度问题 */
+
+/* 1. 卡片头部文字颜色（原灰色背景上的文字） */
+.profile-card-header h3 {
+    color: #212529; /* 深灰色文字，替代原#2d3436 */
+}
+.profile-card-header p {
+    color: #495057; /* 中灰色文字，比原#6c757d更深 */
+}
+
+/* 2. 表单标签文字颜色（确保在白色背景上清晰） */
+.form-group label {
+    color: #343a40; /* 深灰色，替代原#495057 */
+}
+
+/* 3. 输入框文字颜色（禁用状态下更清晰） */
+.form-control {
+    color: #212529; /* 输入框文字颜色 */
+}
+.form-control:disabled {
+    color: #495057; /* 禁用状态文字颜色（比背景深很多） */
+    background-color: #f1f3f5; /* 稍深的灰色背景，增强与文字的对比 */
+}
+
+/* 4. 按钮文字颜色优化（确保按钮上的文字清晰） */
+.btn {
+    color: #ffffff; /* 保持白色文字，但确保按钮背景是深色（已在原有样式中定义） */
+    /* 补充：如果按钮背景过浅，同步加深按钮背景 */
+}
+.btn-secondary {
+    background-color: #495057; /* 加深灰色按钮背景，让白色文字更清晰 */
+}
+
+/* 5. 消息提示区文字颜色 */
+.alert-success {
+    color: #0f5132; /* 加深成功提示文字 */
+    background-color: #d1e7dd; /* 稍浅的成功背景，提升对比 */
+}
+.alert-danger {
+    color: #842029; /* 加深错误提示文字 */
+    background-color: #f8d7da; /* 保持错误背景，确保与文字对比 */
+}

@@ -406,7 +406,7 @@
 
 
                     </div>
-                    <div class="test-result" id="test-result" style = "display: none;">
+                    <div class="test-result" id="test-result" style="display: none;">
                         <div class="test-result-header">
                             <h3>您的心理测评结果</h3>
                             <p>基于科学评估的专业分析报告</p>
@@ -432,15 +432,206 @@
             <div class="the-my-info content-page" data-view="profile">
                 <div class="content-header">
                     <h1 class="content-title">
-                        <i class="fas fa-users-cog"></i> 我的信息
+                        <i class="fas fa-user-circle"></i> 我的信息
                     </h1>
-                    <p class="content-subtitle">我的信息概览</p>
+                    <p class="content-subtitle">查看和编辑您的个人信息</p>
                 </div>
                 <div class="content-body">
-                    {% if current_user.is_authenticated %}
+                    <div class="profile-container">
+                        <!-- 账户信息卡片 -->
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <h3>账户信息</h3>
+                                <p>管理您的登录账户信息</p>
+                            </div>
+                            <div class="profile-card-body">
+                                <div class="form-group">
+                                    <label for="username">用户名</label>
+                                    <input type="text" id="username" class="form-control"
+                                        value="{{ current_user.user_account_info.username }}" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">密码</label>
+                                    <input type="password" id="password" class="form-control" placeholder="不修改请留空"
+                                        disabled>
+                                    <small class="form-text text-muted">请输入新密码，留空则保持不变</small>
+                                </div>
+                            </div>
+                        </div>
 
+                        <!-- 基本信息卡片 -->
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <h3>基本信息</h3>
+                                <p>您的个人基础资料</p>
+                            </div>
+                            <div class="profile-card-body">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="real_name">真实姓名</label>
+                                        <input type="text" id="real_name" class="form-control"
+                                            value="{{ current_user.user_based_info.real_name or '' }}" disabled>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="gender">性别</label>
+                                        <select id="gender" class="form-control" disabled>
+                                            <option value="">请选择</option>
+                                            <option value="男" {% if current_user.user_based_info.gender=='男'
+                                                %}selected{% endif %}>男</option>
+                                            <option value="女" {% if current_user.user_based_info.gender=='女'
+                                                %}selected{% endif %}>女</option>
+                                            <option value="其他" {% if current_user.user_based_info.gender=='其他'
+                                                %}selected{% endif %}>其他</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="birthday">出生日期</label>
+                                        <input type="date" id="birthday" class="form-control"
+                                            value="{{ current_user.user_based_info.birthday or '' }}" disabled>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="height">身高 (cm)</label>
+                                        <input type="number" id="height" class="form-control"
+                                            value="{{ current_user.user_based_info.height or '' }}" min="50" max="250"
+                                            disabled>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="weight">体重 (kg)</label>
+                                        <input type="number" id="weight" class="form-control"
+                                            value="{{ current_user.user_based_info.weight or '' }}" min="10" max="300"
+                                            step="0.1" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                    {% endif %}
+                        <!-- 生活习惯卡片 -->
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <h3>生活习惯</h3>
+                                <p>您的日常作息与饮食习惯</p>
+                            </div>
+                            <div class="profile-card-body">
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="daily_water">每日饮水量 (ml)</label>
+                                        <input type="number" id="daily_water" class="form-control"
+                                            value="{{ current_user.user_habit_info.daily_water or '' }}" min="0"
+                                            disabled>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="sleep_duration">睡眠时长 (小时)</label>
+                                        <input type="number" id="sleep_duration" class="form-control"
+                                            value="{{ current_user.user_habit_info.sleep_duration or '' }}" min="0"
+                                            max="24" step="0.5" disabled>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="exercise_amount">每周运动量 (小时)</label>
+                                        <input type="number" id="exercise_amount" class="form-control"
+                                            value="{{ current_user.user_habit_info.exercise_amount or '' }}" min="0"
+                                            step="0.5" disabled>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="vegetable_fruit_intake">每日蔬菜水果 (克)</label>
+                                        <input type="number" id="vegetable_fruit_intake" class="form-control"
+                                            value="{{ current_user.user_habit_info.vegetable_fruit_intake or '' }}"
+                                            min="0" disabled>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="protein_intake">每日蛋白质 (克)</label>
+                                        <input type="number" id="protein_intake" class="form-control"
+                                            value="{{ current_user.user_habit_info.protein_intake or '' }}" min="0"
+                                            disabled>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="meat_vegetable_ratio">荤素比例</label>
+                                        <input type="text" id="meat_vegetable_ratio" class="form-control"
+                                            value="{{ current_user.user_habit_info.meat_vegetable_ratio or '' }}"
+                                            placeholder="例如 3:7" disabled>
+                                    </div>
+                                    <div class="form-group col-md-8">
+                                        <label for="cooking_method">常用烹饪方式</label>
+                                        <input type="text" id="cooking_method" class="form-control"
+                                            value="{{ current_user.user_habit_info.cooking_method or '' }}" disabled>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="dietary_restrictions">饮食限制</label>
+                                    <textarea id="dietary_restrictions" class="form-control" rows="3" disabled>
+{{ current_user.user_habit_info.dietary_restrictions or '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 心理信息卡片 -->
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <h3>心理状态</h3>
+                                <p>您的心理与情绪相关指标</p>
+                            </div>
+                            <div class="profile-card-body">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="physical_reaction_index">身体反应指数 (0-100)</label>
+                                        <input type="number" id="physical_reaction_index" class="form-control"
+                                            value="{{ current_user.user_psychology.physical_reaction_index or '' }}"
+                                            min="0" max="100" disabled>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="sleep_cognition_bias">睡眠认知偏差 (0-100)</label>
+                                        <input type="number" id="sleep_cognition_bias" class="form-control"
+                                            value="{{ current_user.user_psychology.sleep_cognition_bias or '' }}"
+                                            min="0" max="100" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="exercise_stress_value">运动压力值 (0-100)</label>
+                                        <input type="number" id="exercise_stress_value" class="form-control"
+                                            value="{{ current_user.user_psychology.exercise_stress_value or '' }}"
+                                            min="0" max="100" disabled>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="diet_emotion_dependence">饮食情绪依赖 (0-100)</label>
+                                        <input type="number" id="diet_emotion_dependence" class="form-control"
+                                            value="{{ current_user.user_psychology.diet_emotion_dependence or '' }}"
+                                            min="0" max="100" disabled>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="emotion_stress_index">情绪压力指数 (0-100)</label>
+                                        <input type="number" id="emotion_stress_index" class="form-control"
+                                            value="{{ current_user.user_psychology.emotion_stress_index or '' }}"
+                                            min="0" max="100" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 操作按钮区 -->
+                        <div class="profile-actions">
+                            <button id="edit-btn" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> 编辑信息
+                            </button>
+                            <button id="save-btn" class="btn btn-success" style="display: none;">
+                                <i class="fas fa-save"></i> 保存修改
+                            </button>
+                            <button id="cancel-btn" class="btn btn-secondary" style="display: none;">
+                                <i class="fas fa-times"></i> 取消
+                            </button>
+                        </div>
+
+                        <!-- 消息提示区 -->
+                        <div id="message-alert" class="alert" style="display: none; margin-top: 15px;"></div>
+                    </div>
                 </div>
             </div>
             <div class="the-advice content-page" data-view="advice">
@@ -461,7 +652,7 @@
     <script src="../static/script/index_sidebar.js"></script>
     <script src="../static/script/index_communication.js"></script>
     <script src="../static/script/index_test.js"></script>
-
+    <script src="../static/script/index_profile.js"></script>
     <script>
         //============初始化=============        
         appContainer.style.display = 'flex';

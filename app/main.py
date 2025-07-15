@@ -90,16 +90,16 @@ class PsychologyQuestion(BaseModel):
     s:str
 
 
-# class User(BaseModel):
-#     user_account_info: UserAccountInfo
-#     user_based_info: UserBasedInfo
-#     user_habit_info: UserHabitInfo
-#     user_psychology: UserPsychology
-
-
 class User(BaseModel):
-    username: str | None = None
-    password: str | None = None
+    user_account_info: UserAccountInfo
+    user_based_info: UserBasedInfo
+    user_habit_info: UserHabitInfo
+    user_psychology: UserPsychology
+
+
+# class User(BaseModel):
+#     username: str | None = None
+#     password: str | None = None
 
 
 #=================心理模型==================
@@ -636,6 +636,37 @@ def build_prompt(user_info: User) -> str:
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, current_user: Optional[User] = Depends(get_current_user)):
 
+    current_user = User(
+        user_account_info=UserAccountInfo(
+            username="test_user_001",
+            password="test_password_123"  # 实际测试时可使用加密后的密码
+        ),
+        user_based_info=UserBasedInfo(
+            real_name="张三",
+            gender=1,  # 1=男，2=女，0=未知
+            birthday=date(1990, 5, 15),
+            height=175.5,  # 单位：cm
+            weight=70.3    # 单位：kg
+        ),
+        user_habit_info=UserHabitInfo(
+            daily_water=1.8,  # 单位：L
+            sleep_duration=7.5,  # 单位：小时
+            exercise_amount="每周3次，每次40分钟",
+            vegetable_fruit_intake="每天约500克",
+            protein_intake="每天约70克",
+            meat_vegetable_ratio="3:7",
+            dietary_restrictions="海鲜过敏",
+            cooking_method="蒸、煮为主，少油少盐"
+        ),
+        user_psychology=UserPsychology(
+            physical_reaction_index=65,  # 0-100
+            sleep_cognition_bias="偶尔会担心失眠，但影响不大",
+            exercise_stress_value=30,  # 0-100
+            diet_emotion_dependence="情绪低落时会想吃甜食",
+            emotion_stress_index=45  # 0-100
+        )
+    )
+
     # 获取当前用户
     if not current_user:
         # 如果未登录，重定向到登录页面
@@ -958,41 +989,144 @@ async def submit_test(
     #     "overall_suggestion": overall_suggestion
     # })
 
-# 项目测试模块
+# 更新用户信息路由
+@app.post("/update-user-info", response_class=JSONResponse)
+async def update_user_info(
+    updated_user: User,  # 接收前端发送的用户信息（使用User模型验证）
+    current_user: Optional[User] = Depends(get_current_user)
+):
+    """
+    更新当前登录用户的信息
+    - 接收前端发送的完整用户信息（包含所有子模型）
+    - 仅允许已登录用户修改自己的信息
+    """
+    # 验证登录状态
+    if not current_user:
+        raise HTTPException(status_code=401, detail="未登录，请先登录")
+    
+    # 获取当前用户的用户名（作为users_db的键）
+    current_username = current_user.username
+    if not current_username:
+        raise HTTPException(status_code=400, detail="用户信息不完整")
+    
+    # 验证用户是否存在于数据库中
+    if current_username not in users_db:
+        # 如果用户不存在，初始化一个新记录
+        users_db[current_username] = User(
+            user_account_info=UserAccountInfo(),
+            user_based_info=UserBasedInfo(),
+            user_habit_info=UserHabitInfo(),
+            user_psychology=UserPsychology()
+        )
+    
+    # 更新用户信息（合并新数据，保留未修改的字段）
+    target_user = users_db[current_username]
+    
+    # 1. 更新账户信息（仅更新非空字段）
+    if updated_user.user_account_info:
+        if updated_user.user_account_info.username is not None:
+            target_user.user_account_info.username = updated_user.user_account_info.username
+        if updated_user.user_account_info.password is not None:
+            target_user.user_account_info.password = updated_user.user_account_info.password  # 实际应用中应加密
+    
+    # 2. 更新基本信息
+    if updated_user.user_based_info:
+        if updated_user.user_based_info.real_name is not None:
+            target_user.user_based_info.real_name = updated_user.user_based_info.real_name
+        if updated_user.user_based_info.gender is not None:
+            target_user.user_based_info.gender = updated_user.user_based_info.gender
+        if updated_user.user_based_info.birthday is not None:
+            target_user.user_based_info.birthday = updated_user.user_based_info.birthday
+        if updated_user.user_based_info.height is not None:
+            target_user.user_based_info.height = updated_user.user_based_info.height
+        if updated_user.user_based_info.weight is not None:
+            target_user.user_based_info.weight = updated_user.user_based_info.weight
+    
+    # 3. 更新生活习惯信息
+    if updated_user.user_habit_info:
+        if updated_user.user_habit_info.daily_water is not None:
+            target_user.user_habit_info.daily_water = updated_user.user_habit_info.daily_water
+        if updated_user.user_habit_info.sleep_duration is not None:
+            target_user.user_habit_info.sleep_duration = updated_user.user_habit_info.sleep_duration
+        if updated_user.user_habit_info.exercise_amount is not None:
+            target_user.user_habit_info.exercise_amount = updated_user.user_habit_info.exercise_amount
+        if updated_user.user_habit_info.vegetable_fruit_intake is not None:
+            target_user.user_habit_info.vegetable_fruit_intake = updated_user.user_habit_info.vegetable_fruit_intake
+        if updated_user.user_habit_info.protein_intake is not None:
+            target_user.user_habit_info.protein_intake = updated_user.user_habit_info.protein_intake
+        if updated_user.user_habit_info.meat_vegetable_ratio is not None:
+            target_user.user_habit_info.meat_vegetable_ratio = updated_user.user_habit_info.meat_vegetable_ratio
+        if updated_user.user_habit_info.dietary_restrictions is not None:
+            target_user.user_habit_info.dietary_restrictions = updated_user.user_habit_info.dietary_restrictions
+        if updated_user.user_habit_info.cooking_method is not None:
+            target_user.user_habit_info.cooking_method = updated_user.user_habit_info.cooking_method
+    
+    # 4. 更新心理信息
+    if updated_user.user_psychology:
+        if updated_user.user_psychology.physical_reaction_index is not None:
+            target_user.user_psychology.physical_reaction_index = updated_user.user_psychology.physical_reaction_index
+        if updated_user.user_psychology.sleep_cognition_bias is not None:
+            target_user.user_psychology.sleep_cognition_bias = updated_user.user_psychology.sleep_cognition_bias
+        if updated_user.user_psychology.exercise_stress_value is not None:
+            target_user.user_psychology.exercise_stress_value = updated_user.user_psychology.exercise_stress_value
+        if updated_user.user_psychology.diet_emotion_dependence is not None:
+            target_user.user_psychology.diet_emotion_dependence = updated_user.user_psychology.diet_emotion_dependence
+        if updated_user.user_psychology.emotion_stress_index is not None:
+            target_user.user_psychology.emotion_stress_index = updated_user.user_psychology.emotion_stress_index
+    
+    # 更新当前用户对象（内存中）
+    current_user = target_user
+    
+    # 返回更新后的用户信息（排除密码等敏感字段）
+    return {
+        "status": "success",
+        "message": "用户信息更新成功",
+        "user_info": {
+            "user_account_info": {
+                "username": target_user.user_account_info.username  # 不返回密码
+            },
+            "user_based_info": target_user.user_based_info.dict(),
+            "user_habit_info": target_user.user_habit_info.dict(),
+            "user_psychology": target_user.user_psychology.dict()
+        }
+    }
+
+
+# =======================================项目测试模块
 
 def test_init():
     # 全局变量初始化
     global users_db, active_users, chat_history, advice,current_user
-    # current_user=User(
-    #     user_account_info=UserAccountInfo(
-    #         username="admin",
-    #         password="password",
-    #     ),
-    #     user_based_info=UserBasedInfo(
-    #         real_name="john",
-    #         gender=1,
-    #         birthday=date(2000, 1, 1),
-    #         height=170,
-    #         weight=70,
-    #     ),
-    #     user_habit_info=UserHabitInfo(
-    #         daily_water=2000,
-    #         sleep_duration=8,
-    #         exercise_amount="30分钟",
-    #         vegetable_fruit_intake="100g",
-    #         protein_intake="50g",
-    #         meat_vegetable_ratio="1:1",
-    #         dietary_restrictions="None",
-    #         cooking_method="煮",
-    #     ),
-    #     user_psychology=UserPsychology(
-    #         physical_reaction_index=2,
-    #         sleep_cognition_bias="正常",
-    #         exercise_stress_value=1,
-    #         diet_emotion_dependence="正常",
-    #         emotion_stress_index=3,
-    #     )
-    # )
+    current_user = User(
+        user_account_info=UserAccountInfo(
+            username="test_user_001",
+            password="test_password_123"  # 实际测试时可使用加密后的密码
+        ),
+        user_based_info=UserBasedInfo(
+            real_name="张三",
+            gender=1,  # 1=男，2=女，0=未知
+            birthday=date(1990, 5, 15),
+            height=175.5,  # 单位：cm
+            weight=70.3    # 单位：kg
+        ),
+        user_habit_info=UserHabitInfo(
+            daily_water=1.8,  # 单位：L
+            sleep_duration=7.5,  # 单位：小时
+            exercise_amount="每周3次，每次40分钟",
+            vegetable_fruit_intake="每天约500克",
+            protein_intake="每天约70克",
+            meat_vegetable_ratio="3:7",
+            dietary_restrictions="海鲜过敏",
+            cooking_method="蒸、煮为主，少油少盐"
+        ),
+        user_psychology=UserPsychology(
+            physical_reaction_index=65,  # 0-100
+            sleep_cognition_bias="偶尔会担心失眠，但影响不大",
+            exercise_stress_value=30,  # 0-100
+            diet_emotion_dependence="情绪低落时会想吃甜食",
+            emotion_stress_index=45  # 0-100
+        )
+    )
 
     users_db = {}
     active_users = {
@@ -1039,6 +1173,8 @@ def test_init():
     }
 
 
+
+# test_init()
 
 # init
 
