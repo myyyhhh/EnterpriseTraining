@@ -128,68 +128,86 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 显示测试结果
     function displayTestResults(results) {
-        const dimensionResults = document.getElementById('dimension-results');
-        dimensionResults.innerHTML = ''; // 清空现有内容
+        // 获取结果容器并清空
+        const resultBody = document.getElementById('test-result-body');
+        resultBody.innerHTML = '';
 
+        // 创建维度结果区域
+        const dimensionContainer = document.createElement('div');
+        dimensionContainer.className = 'result-dimensions-container';
+
+        // 遍历每个维度结果并创建卡片
         results.forEach(result => {
             const dimensionCard = document.createElement('div');
-            dimensionCard.className = 'dimension-card';
+            dimensionCard.className = 'dimension-result-card';
 
-            // 设置卡片样式和颜色
+            // 根据分数确定卡片颜色
             let scoreClass = '';
             if (result.score >= 26) {
-                scoreClass = 'bg-success text-white';
+                scoreClass = 'score-high';
             } else if (result.score >= 16) {
-                scoreClass = 'bg-warning text-dark';
+                scoreClass = 'score-medium';
             } else {
-                scoreClass = 'bg-danger text-white';
+                scoreClass = 'score-low';
             }
 
+            // 构建卡片内容
             dimensionCard.innerHTML = `
-            <div class="content-card">
-                <div class="card-header ${scoreClass}">
-                    <h5 class="card-title">
-                        ${result.dimension}
-                    </h5>
-                    <div class="score-badge">得分: ${result.score}</div>
+            <div class="card-header ${scoreClass}">
+                <h3 class="dimension-title">${result.dimension}</h3>
+                <div class="dimension-score">得分: ${result.score}</div>
+            </div>
+            <div class="card-content">
+                <div class="assessment-section">
+                    <h4 class="section-title">评估</h4>
+                    <p class="section-content">${result.assessment}</p>
                 </div>
-                <div class="user-card">
-                    <p><strong>评估:</strong> ${result.assessment}</p>
-                    <p><strong>建议:</strong> ${result.suggestion}</p>
+                <div class="suggestion-section">
+                    <h4 class="section-title">建议</h4>
+                    <p class="section-content">${result.suggestion}</p>
                 </div>
             </div>
         `;
 
-            dimensionResults.appendChild(dimensionCard);
-            dimensionCard.style.display = 'flex';
-            dimensionCard.style.flexDirection = 'column';
+            dimensionContainer.appendChild(dimensionCard);
         });
-        // 显示测试结果
-        document.getElementById('test-result').style.display = 'block';
-        // 滚动到结果区域
-        document.getElementById('test-result').scrollIntoView({ behavior: 'smooth' });
-        // 隐藏测试内容
-        progressContainer.style.display = 'none';
-        testContainer.style.display = 'none';
-        // 加入重新测试按钮
-        // const restartBtn = document.createElement('button');
-        // restartBtn.className = 'btn btn-primary';
-        // restartBtn.textContent = '重新测试';
-        // testContainer.appendChild(restartBtn);
+
+        // 创建综合评估区域
+        const overallAssessment = document.createElement('div');
+        overallAssessment.className = 'overall-assessment-container';
+        overallAssessment.innerHTML = `
+        <h3 class="overall-title">综合评估</h3>
+        <div class="overall-content">基于您的测试结果，我们发现您在多个维度上表现出了不同的心理特征。这些结果可以帮助您更好地了解自己，并采取适当的措施来提升心理健康水平。</div>
+    `;
+
+    //     // 创建专业建议区域
+    //     const professionalSuggestion = document.createElement('div');
+    //     professionalSuggestion.className = 'suggestion-container';
+    //     professionalSuggestion.innerHTML = `
+    //     <h3 class="suggestion-title">
+    //         <i class="fas fa-lightbulb"></i> 专业建议
+    //     </h3>
+    //     <div class="suggestion-content">根据您的测试结果，我们建议您保持积极的生活态度，定期进行自我反思，并考虑与专业心理咨询师进行进一步的交流，以获得更个性化的指导和支持。</div>
+    // `;
+
+        // 添加所有区域到结果容器
+        resultBody.appendChild(dimensionContainer);
+        resultBody.appendChild(overallAssessment);
+        // resultBody.appendChild(professionalSuggestion);
+
         // 创建并添加重新测试按钮
         const restartBtnContainer = document.createElement('div');
-        restartBtnContainer.className = 'restart-btn-container mt-4 text-center';
+        restartBtnContainer.className = 'restart-button-container';
 
         const restartBtn = document.createElement('button');
-        restartBtn.className = 'btn btn-primary';
+        restartBtn.className = 'restart-button';
         restartBtn.innerHTML = '<i class="fas fa-redo"></i> 重新测试';
 
-        // 重新测试按钮点击事件
         restartBtn.addEventListener('click', function () {
             // 重置测试状态
-            document.getElementById('test-result').style.display = 'none'; // 隐藏结果
-            document.getElementById('testContainer').style.display = 'block'; // 显示测试内容
-            document.getElementById('psychology-test-form').reset(); // 重置表单
+            document.getElementById('test-result').style.display = 'none';
+            document.getElementById('testContainer').style.display = 'block';
+            document.getElementById('psychology-test-form').reset();
 
             // 清除所有选项的选中状态
             document.querySelectorAll('.option-item.selected').forEach(option => {
@@ -199,12 +217,20 @@ document.addEventListener('DOMContentLoaded', function () {
             // 重置进度条
             document.getElementById('progress-text').textContent = '0%';
             document.getElementById('progress-fill').style.width = '0%';
-
+            progressContainer.style.display = 'block';
             // 滚动到测试开始位置
             document.querySelector('.progress-container').scrollIntoView({ behavior: 'smooth' });
         });
 
         restartBtnContainer.appendChild(restartBtn);
-        document.querySelector('.result-dimensions').after(restartBtnContainer); // 将按钮添加到建议区域下方
+        resultBody.appendChild(restartBtnContainer);
+
+        // 显示测试结果，隐藏测试内容
+        document.getElementById('test-result').style.display = 'block';
+        document.getElementById('testContainer').style.display = 'none';
+        progressContainer.style.display = 'none';
+
+        // 滚动到结果区域
+        document.getElementById('test-result').scrollIntoView({ behavior: 'smooth' });
     }
 });

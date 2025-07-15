@@ -2147,3 +2147,280 @@ app-container
         justify-content: center;
     }
 }
+
+
+
+
+/* 结果容器样式 */
+.test-result {
+    padding: 2rem;
+    background-color: #f8fafc;
+    border-radius: 0.5rem;
+    margin-top: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.test-result-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.test-result-header h3 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.test-result-header p {
+    color: #64748b;
+    font-size: 1rem;
+}
+
+/* 维度结果卡片样式 */
+.result-dimensions-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.dimension-result-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.dimension-result-card:hover {
+    transform: translateY(-3px);
+}
+
+.card-header {
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dimension-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.dimension-score {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #334155;
+}
+
+.section-content {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: #475569;
+}
+
+/* 分数颜色样式 */
+.score-high {
+    background-color: #10b981; /* 绿色 */
+    color: white;
+}
+
+.score-medium {
+    background-color: #f59e0b; /* 黄色 */
+    color: #1e293b;
+}
+
+.score-low {
+    background-color: #ef4444; /* 红色 */
+    color: white;
+}
+
+/* 综合评估样式 */
+.overall-assessment-container {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.overall-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+}
+
+.overall-title::before {
+    content: '•';
+    color: #3b82f6;
+    margin-right: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.overall-content {
+    line-height: 1.6;
+    color: #475569;
+}
+
+/* 专业建议样式 */
+.suggestion-container {
+    background-color: #f0f9ff;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid #3b82f6;
+    margin-bottom: 2rem;
+}
+
+.suggestion-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+}
+
+.suggestion-title i {
+    margin-right: 0.75rem;
+    color: #3b82f6;
+}
+
+.suggestion-content {
+    line-height: 1.6;
+    color: #475569;
+}
+
+/* 重新测试按钮样式 */
+.restart-button-container {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.restart-button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.restart-button:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.restart-button i {
+    margin-right: 0.5rem;
+}
+
+
+
+/* 对话 */
+
+
+/* 加载中动画样式 */
+.message-loading .loading-indicator {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+}
+
+.message-loading .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #666;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.message-loading .dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.message-loading .dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+
+
+
+/* 添加以下样式到 index.css */
+.loading-indicator {
+    opacity: 0.8;
+}
+
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    height: 20px;
+    padding: 5px 0;
+}
+
+.typing-indicator span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #4a6fa5;
+    border-radius: 50%;
+    margin: 0 3px;
+    opacity: 0.6;
+    animation: typing 1.4s infinite both;
+}
+
+.typing-indicator span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.6;
+    }
+    30% {
+        transform: translateY(-5px);
+        opacity: 1;
+    }
+}
