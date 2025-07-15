@@ -296,8 +296,8 @@
                         </div>
                     </div>
                     <div class="the-communication-input">
-                        <input type="text" placeholder="输入消息...">
-                        <button>发送</button>
+                        <input type="text" placeholder="输入消息..." id="messageInput">
+                        <button id="sendButton">发送</button>
                     </div>
 
 
@@ -309,14 +309,12 @@
             <div class="the-psychological-test content-page" data-view="test">
                 <div class="content-header">
                     <h1 class="content-title">
-                        <i class="fas fa-users-cog"></i> 心理测试
+                        <i class="fas fa-brain"></i> {{ test.title }}
                     </h1>
-                    <p class="content-subtitle">为你做一个心理测试</p>
+                    <p class="content-subtitle">完成以下测试，获取专业心理评估报告</p>
                 </div>
 
-
                 <div class="content-body">
-
 
                 </div>
             </div>
@@ -364,29 +362,6 @@
         // const username = document.getElementById('inputUsername');
         // const password = document.getElementById('inputPassword');
         const appContainer = document.getElementById('app-container');
-
-        // //==============登录==========================
-
-        // // 登录按钮点击事件
-        // loginBtn.addEventListener(
-        //     'click',
-        //     function () {
-        //         const usernameVal = username.value.trim();
-        //         const passwordVal = password.value.trim();
-        //         if (true) {/*right*/
-        //             getLogin();
-        //         } else {
-        //             alert('用户名或密码错误，请重新输入！');
-        //         }
-        //     }
-        // );
-
-        // function getLogin() {
-        //     appContainer.style.display = 'flex';
-        //     loginContainer.style.display = 'none';
-        // }
-
-
         //===========主界面===========================
 
         // ------------折叠功能--------------
@@ -475,100 +450,89 @@
 
         //---------------对话功能-------------------
 
+        const chatHistory = document.getElementById('chatHistory');
+        const inputBox = document.querySelector('.the-communication-input input');
+        const sendBtn = document.querySelector('.the-communication-input button');
+
         // 滚动到聊天区域底部
         function scrollToBottom() {
-            const chatHistory = document.getElementById('chatHistory');
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
-        // 发送消息
+        // 获取DOM元素
+
+
+        // 发送消息函数
         async function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-            if (!message) return;
+            const message = inputBox.value.trim();
+            if (!message) return; // 空消息不发送
 
-            // 禁用输入和按钮
-            input.disabled = true;
-            document.getElementById('sendButton').disabled = true;
-
-            // 添加用户消息到聊天历史
-            addMessageToChat('self', message);
-
-            // 清空输入框
-            input.value = '';
+            // 1. 清空输入框
+            inputBox.value = '';
 
             try {
-                // 发送消息到后端
+                // 2. 发送POST请求到后端
                 const response = await fetch('/send-message', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-Token': '{{ csrf_token }}'
+                        'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: JSON.stringify({ message })
+                    body: new URLSearchParams({ message: message })
                 });
 
-                if (!response.ok) {
-                    throw new Error('发送消息失败');
-                }
-
                 const data = await response.json();
-
-                // 添加AI回复到聊天历史
-                setTimeout(() => {
-                    addMessageToChat('other', data.message, '健康管家');
-                }, 1000);
-
+                if (data.status === 'success') {
+                    // 3. 动态添加用户消息到界面
+                    addMessageToDOM(data.user_message);
+                    // 4. 动态添加AI回复到界面
+                    addMessageToDOM(data.ai_message);
+                }
             } catch (error) {
-                console.error('发送消息错误:', error);
-                // 显示错误消息
-                addMessageToChat('system', '消息发送失败，请重试');
-            } finally {
-                // 重新启用输入和按钮
-                input.disabled = false;
-                document.getElementById('sendButton').disabled = false;
-                input.focus();
+                console.error('发送失败：', error);
+                addMessageToDOM({
+                    sender: 'system',
+                    message: '消息发送失败，请重试',
+                    time: '刚刚'
+                });
             }
         }
 
-        // 添加消息到聊天区域
-        function addMessageToChat(type, content, sender = '') {
-            const chatHistory = document.getElementById('chatHistory');
-
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-
-            const now = new Date();
-            const timeString = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-            if (type === 'self') {
-                messageDiv.classList.add('message-self');
-                messageDiv.innerHTML = `
+        // 动态添加消息到聊天界面
+        function addMessageToDOM(msg) {
+            const div = document.createElement('div');
+            // 根据sender设置样式（匹配前端模板的判断）
+            if (msg.sender === 'human') {
+                div.className = 'message message-self';
+                div.innerHTML = `
             <div class="message-header">
                 <div class="message-sender">我</div>
-                <div class="message-time">${timeString}</div>
+                <div class="message-time">${msg.time}</div>
             </div>
-            <div class="message-content">${content}</div>
+            <div class="message-content">${msg.message}</div>
         `;
-            } else if (type === 'other') {
-                messageDiv.classList.add('message-other');
-                messageDiv.innerHTML = `
+            } else if (msg.sender === 'ai') {
+                div.className = 'message message-other';
+                div.innerHTML = `
             <div class="message-header">
-                <div class="message-sender">${sender}</div>
-                <div class="message-time">${timeString}</div>
+                <div class="message-sender">健康管家</div>
+                <div class="message-time">${msg.time}</div>
             </div>
-            <div class="message-content">${content}</div>
+            <div class="message-content">${msg.message}</div>
         `;
-            } else {
-                messageDiv.classList.add('message-system');
-                messageDiv.innerHTML = `
-            <div class="message-content">${content}</div>
-        `;
+            } else { // system
+                div.className = 'message message-system';
+                div.innerHTML = `<div class="message-content">${msg.message}</div>`;
             }
-
-            chatHistory.appendChild(messageDiv);
-            scrollToBottom();
+            chatHistory.appendChild(div);
+            // 滚动到底部
+            chatHistory.scrollTop = chatHistory.scrollHeight;
         }
+
+        // 绑定发送事件（按钮点击/回车）
+        sendBtn.addEventListener('click', sendMessage);
+        inputBox.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
 
         // 清空聊天记录
         function clearChat() {
@@ -603,12 +567,15 @@
             });
         });
         // 清空聊天按钮
-        document.getElementById('clearChatBtn').addEventListener('click', clearChat);
+        // document.getElementById('clearChatBtn').addEventListener('click', clearChat);
 
         // 输入框自动聚焦
         document.getElementById('messageInput').focus();
 
+        // =====================心理测试================
+        // 心理测试功能实现
 
+        // 心理测试核心逻辑
 
         //============初始化=============        
         appContainer.style.display = 'flex';
