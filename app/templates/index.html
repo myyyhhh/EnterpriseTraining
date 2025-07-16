@@ -475,12 +475,11 @@
                                     <div class="form-group col-md-6">
                                         <label for="gender">性别</label>
                                         <select id="gender" class="form-control" disabled>
-                                            <option value="">请选择</option>
-                                            <option value="男" {% if current_user.user_based_info.gender=='男'
+                                            <option value="男" {% if current_user.user_based_info.gender==1
                                                 %}selected{% endif %}>男</option>
-                                            <option value="女" {% if current_user.user_based_info.gender=='女'
+                                            <option value="女" {% if current_user.user_based_info.gender==2
                                                 %}selected{% endif %}>女</option>
-                                            <option value="其他" {% if current_user.user_based_info.gender=='其他'
+                                            <option value="其他" {% if current_user.user_based_info.gender==0
                                                 %}selected{% endif %}>其他</option>
                                         </select>
                                     </div>
@@ -516,7 +515,7 @@
                             <div class="profile-card-body">
                                 <div class="form-row">
                                     <div class="form-group col-md-4">
-                                        <label for="daily_water">每日饮水量 (ml)</label>
+                                        <label for="daily_water">每日饮水量 (l)</label>
                                         <input type="number" id="daily_water" class="form-control"
                                             value="{{ current_user.user_habit_info.daily_water or '' }}" min="0"
                                             disabled>
@@ -528,8 +527,8 @@
                                             max="24" step="0.5" disabled>
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label for="exercise_amount">每周运动量 (小时)</label>
-                                        <input type="number" id="exercise_amount" class="form-control"
+                                        <label for="exercise_amount">每周运动量</label>
+                                        <input type="text" id="exercise_amount" class="form-control"
                                             value="{{ current_user.user_habit_info.exercise_amount or '' }}" min="0"
                                             step="0.5" disabled>
                                     </div>
@@ -538,13 +537,13 @@
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label for="vegetable_fruit_intake">每日蔬菜水果 (克)</label>
-                                        <input type="number" id="vegetable_fruit_intake" class="form-control"
+                                        <input type="text" id="vegetable_fruit_intake" class="form-control"
                                             value="{{ current_user.user_habit_info.vegetable_fruit_intake or '' }}"
                                             min="0" disabled>
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label for="protein_intake">每日蛋白质 (克)</label>
-                                        <input type="number" id="protein_intake" class="form-control"
+                                        <input type="text" id="protein_intake" class="form-control"
                                             value="{{ current_user.user_habit_info.protein_intake or '' }}" min="0"
                                             disabled>
                                     </div>
@@ -581,34 +580,28 @@
                             <div class="profile-card-body">
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        <label for="physical_reaction_index">身体反应指数 (0-100)</label>
-                                        <input type="number" id="physical_reaction_index" class="form-control"
+                                        <label for="physical_reaction_index">身体反应指数</label>
+                                        <input type="text" id="physical_reaction_index" class="form-control"
                                             value="{{ current_user.user_psychology.physical_reaction_index or '' }}"
                                             min="0" max="100" disabled>
                                     </div>
                                     <div class="form-group col-md-6">
-                                        <label for="sleep_cognition_bias">睡眠认知偏差 (0-100)</label>
-                                        <input type="number" id="sleep_cognition_bias" class="form-control"
+                                        <label for="sleep_cognition_bias">睡眠认知偏差</label>
+                                        <input type="text" id="sleep_cognition_bias" class="form-control"
                                             value="{{ current_user.user_psychology.sleep_cognition_bias or '' }}"
                                             min="0" max="100" disabled>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-4">
-                                        <label for="exercise_stress_value">运动压力值 (0-100)</label>
-                                        <input type="number" id="exercise_stress_value" class="form-control"
+                                        <label for="exercise_stress_value">运动压力值</label>
+                                        <input type="text" id="exercise_stress_value" class="form-control"
                                             value="{{ current_user.user_psychology.exercise_stress_value or '' }}"
                                             min="0" max="100" disabled>
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label for="diet_emotion_dependence">饮食情绪依赖 (0-100)</label>
-                                        <input type="number" id="diet_emotion_dependence" class="form-control"
-                                            value="{{ current_user.user_psychology.diet_emotion_dependence or '' }}"
-                                            min="0" max="100" disabled>
-                                    </div>
-                                    <div class="form-group col-md-4">
-                                        <label for="emotion_stress_index">情绪压力指数 (0-100)</label>
-                                        <input type="number" id="emotion_stress_index" class="form-control"
+                                        <label for="emotion_stress_index">情绪压力指数</label>
+                                        <input type="text" id="emotion_stress_index" class="form-control"
                                             value="{{ current_user.user_psychology.emotion_stress_index or '' }}"
                                             min="0" max="100" disabled>
                                     </div>
@@ -652,7 +645,7 @@
     <script src="../static/script/index_sidebar.js"></script>
     <script src="../static/script/index_communication.js"></script>
     <script src="../static/script/index_test.js"></script>
-    <script src="../static/script/index_profile.js"></script>
+    <script src="../static/script/index_my_info.js"></script>
     <script>
         //============初始化=============        
         appContainer.style.display = 'flex';

@@ -56,6 +56,7 @@ class Advice(BaseModel):
 #     password: str
 
 
+
 class UserAccountInfo(BaseModel):
     username: str | None = None
     password: str | None = None
@@ -79,15 +80,15 @@ class UserHabitInfo(BaseModel):
 
 
 class UserPsychology(BaseModel):
-    physical_reaction_index: int | None = None  # 数据库TINYINT
-    sleep_cognition_bias: str | None = None  # 数据库str
-    exercise_stress_value: int | None = None  # 数据库TINYINT
-    diet_emotion_dependence: str | None = None  # 数据库str
-    emotion_stress_index: int | None = None  # 数据库TINYINT（整数）
+    # 修改
+    physical_reaction_index: str | None = None  # 数据库TINYINT ：躯体反应
+    sleep_cognition_bias: str | None = None  # 数据库str：睡眠认知偏差
+    exercise_stress_value: str | None = None  # 数据库TINYINT：运动压力值
+    emotion_stress_index: str | None = None  # 数据库TINYINT（整数）：情绪压力指标
 
 
-class PsychologyQuestion(BaseModel):
-    s:str
+# class PsychologyQuestion(BaseModel):
+#     s:str
 
 
 class User(BaseModel):
@@ -157,7 +158,12 @@ def get_userHabitInfo(user_info: dict)->UserHabitInfo:
 
 def get_userPsychology(user_info: dict)->UserPsychology:
     """查询用户心理信息"""
-    return UserPsychology(physical_reaction_index=user_info.get("physical_reaction_index"), sleep_cognition_bias=user_info.get("sleep_cognition_bias"), exercise_stress_value=user_info.get("exercise_stress_value"), diet_emotion_dependence=user_info.get("diet_emotion_dependence"), emotion_stress_index=user_info.get("emotion_stress_index"))
+    return UserPsychology(
+        physical_reaction_index=user_info.get("physical_reaction_index"), 
+        sleep_cognition_bias=user_info.get("sleep_cognition_bias"), 
+        exercise_stress_value=user_info.get("exercise_stress_value"), 
+        emotion_stress_index=user_info.get("emotion_stress_index")
+        )
     
 # def get_user(user_info: dict)->Optional[User]:
 #     """查询用户所有信息（包含所有字段）"""
@@ -296,7 +302,37 @@ sender: human or ai or system
 
 
 # 当前用户信息
-current_user:User
+# current_user:User
+
+current_user = User(
+        user_account_info=UserAccountInfo(
+            username="test_user_001",
+            password="test_password_123"  # 实际测试时可使用加密后的密码
+        ),
+        user_based_info=UserBasedInfo(
+            real_name="张三",
+            gender=1,  # 1=男，2=女，0=未知
+            birthday=date(1990, 5, 15),
+            height=175.5,  # 单位：cm
+            weight=70.3    # 单位：kg
+        ),
+        user_habit_info=UserHabitInfo(
+            daily_water=1.8,  # 单位：L
+            sleep_duration=7.5,  # 单位：小时
+            exercise_amount="每周3次，每次40分钟",
+            vegetable_fruit_intake="每天约500克",
+            protein_intake="每天约70克",
+            meat_vegetable_ratio="3:7",
+            dietary_restrictions="海鲜过敏",
+            cooking_method="蒸、煮为主，少油少盐"
+        ),
+        user_psychology=UserPsychology(
+            physical_reaction_index="偶尔感冒",  
+            sleep_cognition_bias="偶尔会担心失眠，但影响不大",
+            exercise_stress_value=" 偶尔会有运动压力", 
+            emotion_stress_index="情绪压力指标： "  
+        )
+    )
 
 # 建议
 advice: Dict[str, Advice]
@@ -312,6 +348,8 @@ test = assessment_data2BaseModels(assessment_data=data)
 
 # 获取当前用户
 def get_current_user(request: Request) -> Optional[User]:
+    global current_user
+    return current_user
     session_id = request.cookies.get("session_id")
     print(session_id, "尝试获取当前用户")
     if session_id and session_id in active_users:
@@ -635,37 +673,35 @@ def build_prompt(user_info: User) -> str:
 # 首页路由
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, current_user: Optional[User] = Depends(get_current_user)):
-
     current_user = User(
-        user_account_info=UserAccountInfo(
-            username="test_user_001",
-            password="test_password_123"  # 实际测试时可使用加密后的密码
-        ),
-        user_based_info=UserBasedInfo(
-            real_name="张三",
-            gender=1,  # 1=男，2=女，0=未知
-            birthday=date(1990, 5, 15),
-            height=175.5,  # 单位：cm
-            weight=70.3    # 单位：kg
-        ),
-        user_habit_info=UserHabitInfo(
-            daily_water=1.8,  # 单位：L
-            sleep_duration=7.5,  # 单位：小时
-            exercise_amount="每周3次，每次40分钟",
-            vegetable_fruit_intake="每天约500克",
-            protein_intake="每天约70克",
-            meat_vegetable_ratio="3:7",
-            dietary_restrictions="海鲜过敏",
-            cooking_method="蒸、煮为主，少油少盐"
-        ),
-        user_psychology=UserPsychology(
-            physical_reaction_index=65,  # 0-100
-            sleep_cognition_bias="偶尔会担心失眠，但影响不大",
-            exercise_stress_value=30,  # 0-100
-            diet_emotion_dependence="情绪低落时会想吃甜食",
-            emotion_stress_index=45  # 0-100
+            user_account_info=UserAccountInfo(
+                username="test_user_001",
+                password="test_password_123"  # 实际测试时可使用加密后的密码
+            ),
+            user_based_info=UserBasedInfo(
+                real_name="张三",
+                gender=1,  # 1=男，2=女，0=未知
+                birthday=date(1990, 5, 15),
+                height=175.5,  # 单位：cm
+                weight=70.3    # 单位：kg
+            ),
+            user_habit_info=UserHabitInfo(
+                daily_water=1.8,  # 单位：L
+                sleep_duration=7.5,  # 单位：小时
+                exercise_amount="每周3次，每次40分钟",
+                vegetable_fruit_intake="每天约500克",
+                protein_intake="每天约70克",
+                meat_vegetable_ratio="3:7",
+                dietary_restrictions="海鲜过敏",
+                cooking_method="蒸、煮为主，少油少盐"
+            ),
+            user_psychology=UserPsychology(
+                physical_reaction_index="偶尔感冒",  
+                sleep_cognition_bias="偶尔会担心失眠，但影响不大",
+                exercise_stress_value=" 偶尔会有运动压力", 
+                emotion_stress_index="情绪压力指标： "  
+            )
         )
-    )
 
     # 获取当前用户
     if not current_user:
@@ -1002,11 +1038,13 @@ async def update_user_info(
     """
     # 验证登录状态
     if not current_user:
+        print("未登录，返回401")
         raise HTTPException(status_code=401, detail="未登录，请先登录")
     
     # 获取当前用户的用户名（作为users_db的键）
-    current_username = current_user.username
+    current_username = current_user.user_account_info.username
     if not current_username:
+        print("当前用户信息不完整，返回400")
         raise HTTPException(status_code=400, detail="用户信息不完整")
     
     # 验证用户是否存在于数据库中
@@ -1022,6 +1060,8 @@ async def update_user_info(
     # 更新用户信息（合并新数据，保留未修改的字段）
     target_user = users_db[current_username]
     
+    print(f"更新用户信息：{updated_user.model_dump()}")
+
     # 1. 更新账户信息（仅更新非空字段）
     if updated_user.user_account_info:
         if updated_user.user_account_info.username is not None:
@@ -1069,14 +1109,16 @@ async def update_user_info(
             target_user.user_psychology.sleep_cognition_bias = updated_user.user_psychology.sleep_cognition_bias
         if updated_user.user_psychology.exercise_stress_value is not None:
             target_user.user_psychology.exercise_stress_value = updated_user.user_psychology.exercise_stress_value
-        if updated_user.user_psychology.diet_emotion_dependence is not None:
-            target_user.user_psychology.diet_emotion_dependence = updated_user.user_psychology.diet_emotion_dependence
+        # if updated_user.user_psychology.diet_emotion_dependence is not None:
+        #     target_user.user_psychology.diet_emotion_dependence = updated_user.user_psychology.diet_emotion_dependence
         if updated_user.user_psychology.emotion_stress_index is not None:
             target_user.user_psychology.emotion_stress_index = updated_user.user_psychology.emotion_stress_index
     
     # 更新当前用户对象（内存中）
     current_user = target_user
     
+    print(current_user.model_dump())
+
     # 返回更新后的用户信息（排除密码等敏感字段）
     return {
         "status": "success",
@@ -1085,9 +1127,9 @@ async def update_user_info(
             "user_account_info": {
                 "username": target_user.user_account_info.username  # 不返回密码
             },
-            "user_based_info": target_user.user_based_info.dict(),
-            "user_habit_info": target_user.user_habit_info.dict(),
-            "user_psychology": target_user.user_psychology.dict()
+            "user_based_info": target_user.user_based_info.model_dump(),
+            "user_habit_info": target_user.user_habit_info.model_dump(),
+            "user_psychology": target_user.user_psychology.model_dump()
         }
     }
 
@@ -1172,24 +1214,6 @@ def test_init():
         "5": Advice(advice="改善心情", content="改善心情可以改善身体机能、减少疲劳、改善睡眠质量、改善心情、减少心脏病发作风险。"),
     }
 
-
-
-# test_init()
-
-# init
-
-
-# test_init()
-# # print(current_user)
-
-# # 启动应用
-# if __name__ == "__main__":
-#     # test_init()
-#     # print(current_user)
-#     print("启动应用")
-#     import uvicorn
-#     uvicorn.run(app="app.main:app", host="127.0.0.1", port=8080,reload=True)
-    
 
 
 
