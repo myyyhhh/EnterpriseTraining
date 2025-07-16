@@ -28,7 +28,7 @@
                 <div class="user-avatar">
                     <i class="fas fa-user"></i>
                 </div>
-                <div class="user-name">{{ current_user.username }}</div>
+                <div class="user-name" id="userName">{{ current_user.user_account_info.username }}</div>
                 <!-- <div class="user-role">高级会员</div> -->
 
                 <!-- 用户切换菜单 -->
@@ -475,12 +475,12 @@
                                     <div class="form-group col-md-6">
                                         <label for="gender">性别</label>
                                         <select id="gender" class="form-control" disabled>
-                                            <option value="男" {% if current_user.user_based_info.gender==1
-                                                %}selected{% endif %}>男</option>
-                                            <option value="女" {% if current_user.user_based_info.gender==2
-                                                %}selected{% endif %}>女</option>
-                                            <option value="其他" {% if current_user.user_based_info.gender==0
-                                                %}selected{% endif %}>其他</option>
+                                            <option value="男" {% if current_user.user_based_info.gender==1 %}selected{%
+                                                endif %}>男</option>
+                                            <option value="女" {% if current_user.user_based_info.gender==2 %}selected{%
+                                                endif %}>女</option>
+                                            <option value="其他" {% if current_user.user_based_info.gender==0 %}selected{%
+                                                endif %}>其他</option>
                                         </select>
                                     </div>
                                 </div>
@@ -628,7 +628,6 @@
                 </div>
             </div>
             <div class="the-advice content-page" data-view="advice">
-
                 <div class="content-header">
                     <h1 class="content-title">
                         <i class="fas fa-users-cog"></i> 管家意见
@@ -636,12 +635,31 @@
                     <p class="content-subtitle">管家意见汇总</p>
                 </div>
                 <div class="content-body">
+                    <!-- 添加按钮区域 -->
+                    <div class="advice-controls">
+                        <button id="generate-advice-btn" class="generate-advice-btn">
+                            <i class="fas fa-magic"></i> 生成管家意见
+                        </button>
+                    </div>
 
+                    <!-- 意见内容显示区域 -->
+                    <div class="advice-content" id="adviceContent">
+                        <!-- 管家意见将在这里显示 -->
+                        <p>点击上方按钮生成管家意见...</p>
+                    </div>
+
+                    <!-- 加载状态指示器 -->
+                    <div class="highlight-box" id="loadingIndicator" style="display: none; margin-top: 20px;">
+                        <i class="fas fa-spinner fa-spin"></i> 正在生成管家意见，请稍候...
+                    </div>
+
+                    <!-- 消息提示区域 -->
+                    <div class="advice-message" id="adviceMessage" style="margin-top: 20px; display: none;"></div>
                 </div>
             </div>
         </div>
     </div>
-
+    <script src="../static/script/index_advice.js"></script>
     <script src="../static/script/index_sidebar.js"></script>
     <script src="../static/script/index_communication.js"></script>
     <script src="../static/script/index_test.js"></script>
@@ -649,7 +667,10 @@
     <script>
         //============初始化=============        
         appContainer.style.display = 'flex';
-
+        const CURRENT_USER = {
+            username: '{{ current_user.username }}',
+            id: '{{ current_user.id }}'
+        };
         switchView('home');
 
     </script>

@@ -40,40 +40,6 @@ function removeLoadingIndicator() {
     }
 }
 
-// // 发送消息函数
-// async function sendMessage() {
-//     const message = inputBox.value.trim();
-//     if (!message) return; // 空消息不发送
-
-//     // 1. 清空输入框
-//     inputBox.value = '';
-
-//     try {
-//         // 2. 发送POST请求到后端
-//         const response = await fetch('/send-message', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/x-www-form-urlencoded',
-//             },
-//             body: new URLSearchParams({ message: message })
-//         });
-
-//         const data = await response.json();
-//         if (data.status === 'success') {
-//             // 3. 动态添加用户消息到界面
-//             addMessageToDOM(data.user_message);
-//             // 4. 动态添加AI回复到界面
-//             addMessageToDOM(data.ai_message);
-//         }
-//     } catch (error) {
-//         console.error('发送失败：', error);
-//         addMessageToDOM({
-//             sender: 'system',
-//             message: '消息发送失败，请重试',
-//             time: '刚刚'
-//         });
-//     }
-// }
 // 发送消息函数 - 修改后
 async function sendMessage() {
 

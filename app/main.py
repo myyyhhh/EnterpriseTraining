@@ -3,6 +3,7 @@ from datetime import date, datetime
 import json
 import logging
 import os
+import re
 import uuid
 import requests
 from fastapi import FastAPI, Request, Form, Depends, HTTPException
@@ -263,8 +264,6 @@ def get_psychology_questions():
     """
     读取心理测试题目：app/static/mental_health_assessment.json
     """
-
-
 
 
 # 使用心理测试题目
@@ -564,7 +563,7 @@ def generate_text(
 
     return ai_answer, chat_history  # 返回AI回答和更新后的对话历史
 
-# ai询问
+# ai意见
 def subjection(user_info: User) -> str:
     """根据用户信息生成健康建议"""
     API_BASE: str = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation"
@@ -600,7 +599,9 @@ def subjection(user_info: User) -> str:
         
         # 提取生成的文本
         if "output" in result and "text" in result["output"]:
-            return result["output"]["text"]
+            advices =result["output"]["text"]
+            
+            return re.findall(r'@([^&]+)&',advices)
         else:
             return "抱歉，未能生成健康建议。"
     except requests.exceptions.RequestException as e:
@@ -653,17 +654,30 @@ def build_prompt(user_info: User) -> str:
         psychology_info += f"您的情绪压力指数为{user_info.user_psychology.emotion_stress_index}。"
     if user_info.user_psychology.physical_reaction_index:
         psychology_info += f"身体反应指数为{user_info.user_psychology.physical_reaction_index}。"
+    if user_info.user_psychology.sleep_cognition_bias:
+        psychology_info += f"睡眠认知偏差为{user_info.user_psychology.sleep_cognition_bias}。"
+    if user_info.user_psychology.exercise_stress_value: 
+        psychology_info += f"运动压力值为{user_info.user_psychology.exercise_stress_value}。"
     
     # 构建完整提示词
     prompt = f"""
-{name}{gender_title}，作为您的健康管家，根据您的个人信息，我为您给出如下健康建议：
+        {name}{gender_title}，作为您的健康管家，根据您的个人信息，我为您给出如下健康建议：
 
-1. 根据健康指标：{base_info}{habit_info}
-2. 根据饮食指标：{diet_info}
-3. 根据心理指标：{psychology_info}
+        1. 根据健康指标：{base_info}{habit_info}
+        2. 根据饮食指标：{diet_info}
+        3. 根据心理指标：{psychology_info}
 
-请提供具体的健康建议，分点列出，语言简洁明了，具有可操作性。
-"""
+        从以下几个方面给出建议.
+        1. 运动方面，
+        2. 饮食方面，
+        3. 睡眠方面，
+        4. 心理方面。
+
+        使用基本文本格式（有各种数字序号、换行等），不要使用markdown格式
+
+        在每个方面的建议开始前加“@”，结束后"&"作为标记符号
+
+        """
     
     return prompt.strip()
 
@@ -1133,11 +1147,33 @@ async def update_user_info(
         }
     }
 
+@app.post("/generate-advice")
+async def generate_advice(request: Request):
+    try:
+        # {'user_name': 'test_user_001', 'request_time': '2025-07-16T07:44:10.028Z'}
+        request = await request.json()
+        # if(request['user_name'] not in users_db):
+        #     return JSONResponse(content={"status": "error", "message": "用户不存在"})
+        # user = users_db[request['user_name']]
+        # advice_list = []
+        print(current_user)
+        advices=subjection(current_user)
+        # result = re.findall(r'@([^&]+)&',advice)
+        response = JSONResponse(content={"status": "success", "advices": advices})
+
+        print(advices)
+
+        return response
+    
+    except Exception as e:
+        print(e)
+        return JSONResponse(content={"status": "error", "message": "系统错误"})
+    
 
 # =======================================项目测试模块
 
 def test_init():
-    # 全局变量初始化
+    # 全局变量初始化/generate-advice
     global users_db, active_users, chat_history, advice,current_user
     current_user = User(
         user_account_info=UserAccountInfo(
