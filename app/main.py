@@ -891,7 +891,7 @@ async def send_message(
         # 调用AI生成函数，传入当前消息、用户名和全局对话历史
         ai_answer, updated_chat_history = generate_text(
             user_input=message,
-            current_user=current_user.username,
+            current_user=current_user.user_account_info.username,
             chat_history=chat_history  # 传入全局对话历史
         )
         # 更新全局对话历史
