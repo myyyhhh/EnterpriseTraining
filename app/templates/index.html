@@ -10,11 +10,96 @@
     <link rel="stylesheet" type="text/css" href="../static/CSS/index.css">
 
     <style>
-        /* index.css */
+        /* 模态框遮罩层 */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            z-index: 1000;
+        }
+        
+        /* 模态框样式 */
+        .modal-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            width: 90%;
+            max-width: 500px;
+            display: none;
+            animation: modalAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+        
+        .modal-header {
+            padding: 20px 25px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s;
+        }
+        
+        .modal-close:hover {
+            color: #e74c3c;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        .modal-message {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .modal-footer {
+            padding: 15px 25px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            border-top: 1px solid #eee;
+        }
     </style>
 </head>
 
 <body>
+
     <div class="app-container" id="app-container">
         <!-- 左侧导航 -->
         <div class="sidebar" id="sidebar">
@@ -29,23 +114,23 @@
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="user-name" id="userName">{{ current_user.user_account_info.username }}</div>
-                <!-- <div class="user-role">高级会员</div> -->
 
-                <!-- 用户切换菜单 -->
+                <!-- 用户列表,切换菜单 -->
                 <div class="user-switch-menu" id="userSwitchMenu">
-                    <div class="switch-user-item">
-                        <i class="fas fa-user"></i> 用户一
+                    <!-- 用户列表将通过JavaScript动态加载 -->
+                    <div id="userListContainer"></div>
+
+                    <!-- 添加用户按钮 -->
+                    <div class="menu-item" id="addUserBtn">
+                        <i class="fas fa-user-plus mr-2"></i> 添加用户
                     </div>
-                    <div class="switch-user-item">
-                        <i class="fas fa-user"></i> 用户二
-                    </div>
-                    <div class="switch-user-item">
-                        <i class="fas fa-user-plus"></i> 添加用户
-                    </div>
-                    <div class="switch-user-item">
-                        <i class="fas fa-sign-out-alt"></i> 退出登录
+
+                    <!-- 退出登录按钮 -->
+                    <div class="menu-item" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt mr-2"></i> 退出登录
                     </div>
                 </div>
+
             </div>
 
             <!-- 导航菜单 -->
@@ -659,19 +744,70 @@
             </div>
         </div>
     </div>
-    <script src="../static/script/index_advice.js"></script>
-    <script src="../static/script/index_sidebar.js"></script>
-    <script src="../static/script/index_communication.js"></script>
-    <script src="../static/script/index_test.js"></script>
-    <script src="../static/script/index_my_info.js"></script>
+    <!-- 退出登录确认对话框 -->
+    <div class="modal-backdrop" id="logoutModalBackdrop"></div>
+
+    <div class="modal-dialog" id="logoutModal">
+        <div class="modal-header">
+            <h3 class="modal-title">确认退出登录</h3>
+            <button class="modal-close" id="closeLogoutModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-message">您确定要退出当前账号吗？退出后需要重新登录才能访问您的账户信息。</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelLogoutBtn">取消</button>
+            <button class="btn btn-danger" id="confirmLogoutBtn">确认退出</button>
+        </div>
+    </div>
+
+    <!-- 添加新用户表单 -->
+    <div class="modal-backdrop" id="addUserModalBackdrop"></div>
+
+    <div class="modal-dialog" id="addUserModal">
+        <div class="modal-header">
+            <h3 class="modal-title">添加新用户</h3>
+            <button class="modal-close" id="closeAddUserModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label for="newUsername">用户名</label>
+                    <input type="text" id="newUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">密码</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">确认密码</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelAddUserBtn">取消</button>
+            <button type="submit" form="addUserForm" class="btn btn-primary">添加用户</button>
+        </div>
+    </div>
+
+
+    <script type="module" src="../static/script/index_advice.js"></script>
+    <script type="module" src="../static/script/index_sidebar.js"></script>
+    <script type="module" src="../static/script/index_communication.js"></script>
+    <script type="module" src="../static/script/index_test.js"></script>
+    <script type="module" src="../static/script/index_my_info.js"></script>
+    <script type="module" src="../static/script/index_user_operations.js"></script>
     <script>
-        //============初始化=============        
+        //============初始化=============    
+        const appContainer = document.getElementById('app-container');    
         appContainer.style.display = 'flex';
         const CURRENT_USER = {
             username: '{{ current_user.username }}',
             id: '{{ current_user.id }}'
         };
-        switchView('home');
+        
+        // switchView('home');
 
     </script>
 </body>

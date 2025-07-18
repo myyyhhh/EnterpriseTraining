@@ -1,3 +1,4 @@
+
 # 确保导入所有必要的模块
 from datetime import date, datetime
 import json
@@ -14,7 +15,10 @@ from fastapi.templating import Jinja2Templates
 from pathlib import Path
 import secrets
 from typing import Any, Dict, List, Literal, Optional
-
+import json
+import logging
+from pathlib import Path
+from typing import Dict, Any
 
 
 app = FastAPI()
@@ -22,8 +26,9 @@ app = FastAPI()
 # 挂载静态文件目录
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR,"static")
-print(STATIC_DIR)
+# print(STATIC_DIR)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
 # app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # # /static：这是URL路径前缀，表示所有以/static开头的请求都会被交给StaticFiles处理。
@@ -45,12 +50,6 @@ templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 # ========模板定义==============
 
 from pydantic import BaseModel
-
-
-class Advice(BaseModel):
-    advice: str
-    content: str
-
 
 # class User(BaseModel):
 #     username: str
@@ -88,20 +87,12 @@ class UserPsychology(BaseModel):
     emotion_stress_index: str | None = None  # 数据库TINYINT（整数）：情绪压力指标
 
 
-# class PsychologyQuestion(BaseModel):
-#     s:str
-
-
 class User(BaseModel):
     user_account_info: UserAccountInfo
     user_based_info: UserBasedInfo
     user_habit_info: UserHabitInfo
     user_psychology: UserPsychology
 
-
-# class User(BaseModel):
-#     username: str | None = None
-#     password: str | None = None
 
 
 #=================心理模型==================
@@ -142,7 +133,7 @@ class PsychologyQuestions(BaseModel):
     dimensions: List[Dimension]         # 所有维度(长度4)
 
 
-# ===================================================
+# ======================数据库中信息读取成user对象=======================
 
 
 def get_userAccountInfo(user_info: dict)->UserAccountInfo:
@@ -166,22 +157,17 @@ def get_userPsychology(user_info: dict)->UserPsychology:
         emotion_stress_index=user_info.get("emotion_stress_index")
         )
     
-# def get_user(user_info: dict)->Optional[User]:
-#     """查询用户所有信息（包含所有字段）"""
-#     user_account_info: UserAccountInfo = get_userAccountInfo(user_info)
-#     user_based_info: UserBasedInfo = get_userBasedInfo(user_info)
-#     user_habit_info: UserHabitInfo = get_userHabitInfo(user_info)
-#     user_psychology: UserPsychology = get_userPsychology(user_info)
+def get_user(user_info: dict)->Optional[User]:
+    """查询用户所有信息（包含所有字段）"""
+    user_account_info: UserAccountInfo = get_userAccountInfo(user_info)
+    user_based_info: UserBasedInfo = get_userBasedInfo(user_info)
+    user_habit_info: UserHabitInfo = get_userHabitInfo(user_info)
+    user_psychology: UserPsychology = get_userPsychology(user_info)
 
-#     return User(user_account_info=user_account_info, user_based_info=user_based_info, user_habit_info=user_habit_info, user_psychology=user_psychology)
+    return User(user_account_info=user_account_info, user_based_info=user_based_info, user_habit_info=user_habit_info, user_psychology=user_psychology)
 
 
 # ======================心理==========
-
-import json
-import logging
-from pathlib import Path
-from typing import Dict, Any
 
 def load_psychology_assessment(json_path: str | Path) -> Dict[str, Any]:
     """
@@ -272,16 +258,101 @@ def use_psychology_questions():
 
 
 
+# =======================================项目测试模块====================================
+
+
+def get_some_user()->User:
+    return User(
+            user_account_info=UserAccountInfo(
+                username="test_user_001",
+                password="test_password_123"  # 实际测试时可使用加密后的密码
+            ),
+            user_based_info=UserBasedInfo(
+                real_name="张三",
+                gender=1,  # 1=男，2=女，0=未知
+                birthday=date(1990, 5, 15),
+                height=175.5,  # 单位：cm
+                weight=70.3    # 单位：kg
+            ),
+            user_habit_info=UserHabitInfo(
+                daily_water=1.8,  # 单位：L
+                sleep_duration=7.5,  # 单位：小时
+                exercise_amount="每周3次，每次40分钟",
+                vegetable_fruit_intake="每天约500克",
+                protein_intake="每天约70克",
+                meat_vegetable_ratio="3:7",
+                dietary_restrictions="海鲜过敏",
+                cooking_method="蒸、煮为主，少油少盐"
+            ),
+            user_psychology=UserPsychology(
+                physical_reaction_index="偶尔会有心理压力",  
+                sleep_cognition_bias="偶尔会担心失眠，但影响不大",
+                exercise_stress_value="偶尔会有运动压力",  
+                emotion_stress_index="情绪压力指标： "  
+            )
+        )
+
+def get_some_chatHistory()->dict:
+    return {
+        "123": [
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "12:23:22"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "1分钟前"},
+            {"sender": "human", "message": "hello", "time": "刚刚"},
+            {"sender": "ai", "message": "hi", "time": "12:23:22"},
+        ],
+        "user2": [
+            {"sender": "user2", "message": "how are you", "time": "2分钟前"}
+        ]
+    }
+
+
+
+def test_init():
+    # 全局变量初始化/generate-advice
+    global users_db, active_users, chat_history,current_user
+    
+
+    current_user = get_some_user()
+    chat_history = get_some_chatHistory()
+
+
+
+
 # ===============全局变量===================
 
 # 存储所有用户数据
-users_db: Dict[str, User] = {}
+users_db: Dict[str, User] = {
+    "test_user_001":get_some_user()
 
-# 存储当前登录用户
+}
+
+# 存储session的当前登录用户
 active_users: Dict[str, str] = {}  # session_id: username
 
 # 对话历史
 chat_history: dict[str, List[Dict[str, str]]] = {}  # username: [message1, message2,...]
+
+
 """
 user: [sender, message, time]
 示例
@@ -300,55 +371,19 @@ sender: human or ai or system
 """
 
 
-# 当前用户信息
-# current_user:User
 
-current_user = User(
-        user_account_info=UserAccountInfo(
-            username="test_user_001",
-            password="test_password_123"  # 实际测试时可使用加密后的密码
-        ),
-        user_based_info=UserBasedInfo(
-            real_name="张三",
-            gender=1,  # 1=男，2=女，0=未知
-            birthday=date(1990, 5, 15),
-            height=175.5,  # 单位：cm
-            weight=70.3    # 单位：kg
-        ),
-        user_habit_info=UserHabitInfo(
-            daily_water=1.8,  # 单位：L
-            sleep_duration=7.5,  # 单位：小时
-            exercise_amount="每周3次，每次40分钟",
-            vegetable_fruit_intake="每天约500克",
-            protein_intake="每天约70克",
-            meat_vegetable_ratio="3:7",
-            dietary_restrictions="海鲜过敏",
-            cooking_method="蒸、煮为主，少油少盐"
-        ),
-        user_psychology=UserPsychology(
-            physical_reaction_index="偶尔感冒",  
-            sleep_cognition_bias="偶尔会担心失眠，但影响不大",
-            exercise_stress_value=" 偶尔会有运动压力", 
-            emotion_stress_index="情绪压力指标： "  
-        )
-    )
+psychology_questions = load_psychology_assessment(json_path="app\\static\\mental_health_assessment.json")
 
-# 建议
-advice: Dict[str, Advice]
-
-data = load_psychology_assessment(json_path="app\\static\\mental_health_assessment.json")
-
-test = assessment_data2BaseModels(assessment_data=data)
+test = assessment_data2BaseModels(assessment_data=psychology_questions)
 
 
 #=========================功能函数==============================
 
-
+# _________________________用户信息_______________________
 
 # 获取当前用户
 def get_current_user(request: Request) -> Optional[User]:
-    global current_user
-    return current_user
+
     session_id = request.cookies.get("session_id")
     print(session_id, "尝试获取当前用户")
     if session_id and session_id in active_users:
@@ -380,38 +415,83 @@ def get_all_users()->List[User]:
     return list(users_db.values())
 
 
+# 创建一个新用户
+def get_new_user(username: str, password: str)->User:
+    return User(
+        user_account_info=UserAccountInfo(
+            username=username,
+            password=password
+        ),
+        user_based_info=UserBasedInfo(),
+        user_habit_info=UserHabitInfo(),
+        user_psychology=UserPsychology()
+    )
+
+
+
+# __________________数据库函数_______________________
+
+def db_user_exists(username: str)->bool:
+    """
+    检查数据库中是否存在指定用户名的用户
+    """
+    return username in users_db
+
+def db_get_user(username: str)->Optional[User]:
+    """
+    从数据库中获取指定用户名的用户
+    """
+    if db_user_exists(username):
+        return users_db[username]
+    
+    logging.warning(f"F(db_get_user):数据库中不存在用户名为{username}的用户")
+    return None
+
+def db_add_user(user: User)->None:
+    """
+    向数据库中添加用户
+    """
+    if db_user_exists(user.user_account_info.username):
+        logging.warning(f"F(db_add_user):数据库中已存在用户名为{user.user_account_info.username}的用户")
+        return
+    
+    users_db[user.user_account_info.username] = user
+
+
+# ___________________注册/登录_________________________
+
 # 登录验证
 def authenticate_user(username: str, password: str) -> Optional[User]:
-    # 1. 先检查硬编码的测试用户（123/321）
-    if username == "123" and password == "321":
-        # 正确创建User实例：包含4个子模型（必须按这个结构！）
-        print("登录成功！test-------------------------------")
-        return User(
-            
-                username=username,  # 子模型中传入用户名
-                password=password   # 子模型中传入密码
-            # ),
-            # user_based_info=UserBasedInfo(),  # 空的基本信息
-            # user_habit_info=UserHabitInfo(),  # 空的习惯信息
-            # user_psychology=UserPsychology()  # 空的心理信息
-        )
-    
-    # 2. 再检查数据库中的用户（users_db）
-    if username in users_db:
-        user = users_db[username]
-        # 验证密码（密码存储在user_account_info子模型中）
-        if user.user_account_info.password == password:
-            return user
+    """
+        验证用户名和密码是否匹配,返回User对象或None
+    """
+    if db_user_exists(username=username):
+        return db_get_user(username=username)
     
     # 3. 验证失败返回None
     return None
 
+# 返回一个新user
+def get_new_user(username: str, password: str)->User:
+    return User(
+        user_account_info=UserAccountInfo(
+            username=username,
+            password=password
+        ),
+        user_based_info=UserBasedInfo(),
+        user_habit_info=UserHabitInfo(),
+        user_psychology=UserPsychology()
+    )
 
 # 注册功能
 def sign_up(username: str, password: str)->User:
+    if username in users_db:
+        raise HTTPException(status_code=400, detail="用户名已存在")
+    new_uesr = get_new_user(username, password)
+    users_db[username] = new_uesr
+    return new_uesr
 
-    return User(username=username, password=password)
-
+# ____________________AI_______________________________
 
 # ai回答生成
 def generate_text(
@@ -607,7 +687,6 @@ def subjection(user_info: User) -> str:
     except requests.exceptions.RequestException as e:
         return f"API请求错误: {str(e)}"
 
-
 # 提示词生成
 def build_prompt(user_info: User) -> str:
     """构建向API发送的提示词"""
@@ -682,40 +761,16 @@ def build_prompt(user_info: User) -> str:
     return prompt.strip()
 
 
-# =================路由定义========================
+
+# /===========================================================
+# =================路由定义====================================
+# ====
+
+
 
 # 首页路由
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, current_user: Optional[User] = Depends(get_current_user)):
-    current_user = User(
-            user_account_info=UserAccountInfo(
-                username="test_user_001",
-                password="test_password_123"  # 实际测试时可使用加密后的密码
-            ),
-            user_based_info=UserBasedInfo(
-                real_name="张三",
-                gender=1,  # 1=男，2=女，0=未知
-                birthday=date(1990, 5, 15),
-                height=175.5,  # 单位：cm
-                weight=70.3    # 单位：kg
-            ),
-            user_habit_info=UserHabitInfo(
-                daily_water=1.8,  # 单位：L
-                sleep_duration=7.5,  # 单位：小时
-                exercise_amount="每周3次，每次40分钟",
-                vegetable_fruit_intake="每天约500克",
-                protein_intake="每天约70克",
-                meat_vegetable_ratio="3:7",
-                dietary_restrictions="海鲜过敏",
-                cooking_method="蒸、煮为主，少油少盐"
-            ),
-            user_psychology=UserPsychology(
-                physical_reaction_index="偶尔感冒",  
-                sleep_cognition_bias="偶尔会担心失眠，但影响不大",
-                exercise_stress_value=" 偶尔会有运动压力", 
-                emotion_stress_index="情绪压力指标： "  
-            )
-        )
 
     # 获取当前用户
     if not current_user:
@@ -762,9 +817,11 @@ async def login(
     登录请求处理函数
     - **username**: 用户名
     - **password**: 密码
-    
     """
+    global active_users
+
     print(username, password,"尝试登录")
+
     user = authenticate_user(username, password)
     if not user:
         print("登录失败，返回错误页面")
@@ -778,8 +835,7 @@ async def login(
             }
         )
     
-
-    
+ 
     # 创建session
     session_id = secrets.token_urlsafe(16)
     active_users[session_id] = username
@@ -796,14 +852,23 @@ async def login(
 
 
 # 退出登录
-@app.get("/logout")
+@app.post("/logout")  # 改为POST方法
 async def logout(request: Request):
     session_id = request.cookies.get("session_id")
-    if session_id in active_users:
+    if session_id and session_id in active_users:
+        # 可选：获取用户名并清理关联数据（如临时会话缓存）
+        # username = active_users[session_id]
+        # if username in temp_data:  # 示例：清理临时数据
+        #     del temp_data[username]
         del active_users[session_id]
     
     response = RedirectResponse(url="/login", status_code=303)
-    response.delete_cookie("session_id")
+    # 删除cookie时指定与设置时一致的参数（确保正确删除）
+    response.delete_cookie(
+        key="session_id",
+        httponly=True,
+        samesite="Lax"
+    )
     return response
 
 
@@ -822,10 +887,11 @@ async def switch_user(
     
     # 更新当前会话的用户
     session_id = request.cookies.get("session_id")
-    if session_id:
+    if session_id and session_id in active_users:  # 检查会话有效性
         active_users[session_id] = target_user
-    
-    return JSONResponse(content={"status": "success", "username": target_user})
+        return JSONResponse(content={"status": "success", "username": target_user})
+    else:
+        raise HTTPException(status_code=401, detail="会话已失效，请重新登录")
 
 
 # 添加新用户
@@ -839,14 +905,15 @@ async def add_user(
     if not current_user:
         raise HTTPException(status_code=401, detail="未登录")
     
-    if new_username in users_db:
+    if db_user_exists(username=new_username):
         return JSONResponse(content={"status": "error", "message": "用户名已存在"})
     
+
+
     # 创建新用户
-    users_db[new_username] = User(
-        username=new_username,
-        password=new_password
-    )
+    new_user =  get_new_user(username=new_username, password=new_password)
+
+    db_add_user(new_user)
     
     return JSONResponse(content={"status": "success", "username": new_username})
 
@@ -991,54 +1058,6 @@ async def submit_test(
         "results": results
     })
 
-    # return {"status": "success", "results": results}
-    # # 计算每个维度的得分
-    # dimension_scores = {}
-    # for question_id, answer in answers.items():
-    #     dimension = answer['dimension']
-    #     score = answer['score']
-    #     if dimension not in dimension_scores:
-    #         dimension_scores[dimension] = 0
-    #     dimension_scores[dimension] += score
-    # # 准备维度结果
-    # dimension_results = []
-    # for dimension_name, score in dimension_scores.items():
-    #     # 找到对应的维度配置
-    #     dimension_config = None
-    #     for dim in test.dimensions:
-    #         if dim.name == dimension_name:
-    #             dimension_config = dim
-    #             break 
-    #     if not dimension_config:
-    #         continue  
-    #     # 查找对应的评分范围
-    #     assessment = "未知"
-    #     suggestion = "无建议"
-    #     for range_config in dimension_config.ranges:
-    #         if range_config.min <= score <= range_config.max:
-    #             assessment = range_config.assessment
-    #             suggestion = range_config.suggestion
-    #             break
-    #     dimension_results.append({
-    #         "dimension": dimension_name,
-    #         "score": score,
-    #         "assessment": assessment,
-    #         "suggestion": suggestion
-    #     })
-    # # 计算总体评估（简单平均）
-    # total_score = sum(score for score in dimension_scores.values())
-    # average_score = total_score / len(dimension_scores) if dimension_scores else 0
-    # # 根据平均分给出总体评估和建议
-    # overall_assessment, overall_suggestion = get_overall_assessment(average_score)    
-    # # 这里可以保存测试结果到数据库
-    # # save_test_results(current_user.username, dimension_results, overall_assessment, overall_suggestion)    
-    # return JSONResponse(content={
-    #     "status": "success",
-    #     "dimension_results": dimension_results,
-    #     "overall_assessment": overall_assessment,
-    #     "overall_suggestion": overall_suggestion
-    # })
-
 # 更新用户信息路由
 @app.post("/update-user-info", response_class=JSONResponse)
 async def update_user_info(
@@ -1147,6 +1166,7 @@ async def update_user_info(
         }
     }
 
+# 生成管家意见
 @app.post("/generate-advice")
 async def generate_advice(request: Request):
     try:
@@ -1169,87 +1189,5 @@ async def generate_advice(request: Request):
         print(e)
         return JSONResponse(content={"status": "error", "message": "系统错误"})
     
-
-# =======================================项目测试模块
-
-def test_init():
-    # 全局变量初始化/generate-advice
-    global users_db, active_users, chat_history, advice,current_user
-    current_user = User(
-        user_account_info=UserAccountInfo(
-            username="test_user_001",
-            password="test_password_123"  # 实际测试时可使用加密后的密码
-        ),
-        user_based_info=UserBasedInfo(
-            real_name="张三",
-            gender=1,  # 1=男，2=女，0=未知
-            birthday=date(1990, 5, 15),
-            height=175.5,  # 单位：cm
-            weight=70.3    # 单位：kg
-        ),
-        user_habit_info=UserHabitInfo(
-            daily_water=1.8,  # 单位：L
-            sleep_duration=7.5,  # 单位：小时
-            exercise_amount="每周3次，每次40分钟",
-            vegetable_fruit_intake="每天约500克",
-            protein_intake="每天约70克",
-            meat_vegetable_ratio="3:7",
-            dietary_restrictions="海鲜过敏",
-            cooking_method="蒸、煮为主，少油少盐"
-        ),
-        user_psychology=UserPsychology(
-            physical_reaction_index=65,  # 0-100
-            sleep_cognition_bias="偶尔会担心失眠，但影响不大",
-            exercise_stress_value=30,  # 0-100
-            diet_emotion_dependence="情绪低落时会想吃甜食",
-            emotion_stress_index=45  # 0-100
-        )
-    )
-
-    users_db = {}
-    active_users = {
-
-    }
-    chat_history = {
-        "123": [
-            {"sender": "human", "message": "hello", "time": "刚刚"},
-            {"sender": "ai", "message": "hi", "time": "1分钟前"},
-            {"sender": "human", "message": "hello", "time": "刚刚"},
-            {"sender": "ai", "message": "hi", "time": "1分钟前"},
-            {"sender": "human", "message": "hello", "time": "刚刚"},
-            {"sender": "ai", "message": "hi", "time": "1分钟前"},
-            {"sender": "human", "message": "hello", "time": "刚刚"},
-            {"sender": "ai", "message": "hi", "time": "1分钟前"},
-            {"sender": "human", "message": "hello", "time": "刚刚"},
-            {"sender": "ai", "message": "hi", "time": "1分钟前"},
-            {"sender": "human", "message": "hello", "time": "刚刚"},
-            {"sender": "ai", "message": "hi", "time": "12:23:22"},
-            {"sender": "human", "message": "hello", "time": "刚刚"},
-            {"sender": "ai", "message": "hi", "time": "1分钟前"},
-            {"sender": "human", "message": "hello", "time": "刚刚"},
-            {"sender": "ai", "message": "hi", "time": "1分钟前"},
-            {"sender": "human", "message": "hello", "time": "刚刚"},
-            {"sender": "ai", "message": "hi", "time": "1分钟前"},
-            {"sender": "human", "message": "hello", "time": "刚刚"},
-            {"sender": "ai", "message": "hi", "time": "1分钟前"},
-            {"sender": "human", "message": "hello", "time": "刚刚"},
-            {"sender": "ai", "message": "hi", "time": "1分钟前"},
-            {"sender": "human", "message": "hello", "time": "刚刚"},
-            {"sender": "ai", "message": "hi", "time": "12:23:22"},
-        ],
-        "user2": [
-            {"sender": "user2", "message": "how are you", "time": "2分钟前"}
-        ]
-    }
-    # ccurrent_uesr = User(username="admin", password="password")
-    advice = {
-        "1": Advice(advice="减肥", content="减肥可以缓解疲劳、减少体重、改善睡眠质量、改善心情、减少心脏病发作风险。"),
-        "2": Advice(advice="锻炼", content="锻炼可以改善身体机能、减少疲劳、改善睡眠质量、改善心情、减少心脏病发作风险。"),
-        "3": Advice(advice="改善睡眠", content="改善睡眠可以改善身体机能、减少疲劳、改善睡眠质量、改善心情、减少心脏病发作风险。"),
-        "4": Advice(advice="减少运动", content="减少运动可以改善身体机能、减少疲劳、改善睡眠质量、改善心情、减少心脏病发作风险。"),
-        "5": Advice(advice="改善心情", content="改善心情可以改善身体机能、减少疲劳、改善睡眠质量、改善心情、减少心脏病发作风险。"),
-    }
-
-
 
 
