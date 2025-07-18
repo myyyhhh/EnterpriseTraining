@@ -117,6 +117,12 @@ class PsychologyQuestions(BaseModel):
     title: str                          # 测评标题
     dimensions: List[Dimension]         # 所有维度(长度4)
 
+def setPsychologyTestResult(user:User,result:list[str]):
+    """设置心理测评结果"""
+    user.user_psychology.physical_reaction_index = result[0]
+    user.user_psychology.sleep_cognition_bias = result[1]
+    user.user_psychology.exercise_stress_value = result[2]
+    user.user_psychology.emotion_stress_index = result[3]
 
 # ======================数据库中信息读取成user对象=======================
 
@@ -372,19 +378,19 @@ def get_current_user(request: Request) -> Optional[User]:
         print(f"当前用户：{username}")
         
         # 1. 优先从数据库获取用户（如果存在）
-        if username in users_db:
-            return users_db[username]
+        if db_user_exists(username):
+            return db_get_user(username)
         
         # 2. 数据库中不存在时，创建符合结构的临时用户
-        return User(
-            # user_account_info=UserAccountInfo(
-                username=username,  # 子模型中传入用户名
-                password="password"  # 临时密码（实际场景可留空）
-            # ),
-            # user_based_info=UserBasedInfo(),  # 空的基本信息
-            # user_habit_info=UserHabitInfo(),  # 空的习惯信息
-            # user_psychology=UserPsychology()  # 空的心理信息
-        )
+        # return User(
+        #     # user_account_info=UserAccountInfo(
+        #         username=username,  # 子模型中传入用户名
+        #         password="password"  # 临时密码（实际场景可留空）
+        #     # ),
+        #     # user_based_info=UserBasedInfo(),  # 空的基本信息
+        #     # user_habit_info=UserHabitInfo(),  # 空的习惯信息
+        #     # user_psychology=UserPsychology()  # 空的心理信息
+        # )
     
     print("未登录，返回None")
     return None
@@ -1058,6 +1064,12 @@ async def submit_test(
             "assessment": assessment,
             "suggestion": suggestion
         })
+
+    assessment_list = [result["assessment"] for result in results]
+
+
+    setPsychologyTestResult(user=current_user, result=assessment_list)
+
 
     # print(results)
 

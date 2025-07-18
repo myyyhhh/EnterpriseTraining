@@ -122,21 +122,34 @@ W:后端数据的接收、存储、调用
 W:后端心理咨询模块，协助分析后端数据给出建议.
 
 
-1. ai对话模块：(3天)
-2. 信息收集模块：（3天）
-3. 用户信息展示模块：（2天）
-4. 管家意见模块：（2天）
-5. 统一数据接口、测试、优化（4天）
 
 
+```
+app/
+├── main.py                  # 应用入口
+├── config.py                # 全局配置与变量
+├── dependencies.py          # 通用依赖项
+├── models/
+│   ├── __init__.py
+│   ├── user.py              # 用户相关模型
+│   └── psychology.py        # 心理测试相关模型
+├── routes/
+│   ├── __init__.py
+│   ├── main_routes.py       # 首页/登录/注册路由
+│   ├── user_routes.py       # 用户信息路由
+│   ├── chat_routes.py       # 聊天功能路由
+│   └── psychology_routes.py # 心理测试路由
+├── services/
+│   ├── __init__.py
+│   ├── user_service.py      # 用户业务逻辑
+│   ├── ai_service.py        # AI相关业务
+│   └── psychology_service.py # 心理测试业务
+└── utils/
+    ├── __init__.py
+    ├── file_utils.py        # 文件处理工具
+    └── text_utils.py        # 文本处理工具
 
-开始有默认用户
 
-可以增加用户、删除用户，删除最后一个用户后加一个默认用户
-
-用户数据：user_db:ditc[user_id] = user_info
-
-当前用户：current_user = user_id
+```
 
 
-profile:个人档案
