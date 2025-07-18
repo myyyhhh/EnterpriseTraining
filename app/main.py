@@ -34,8 +34,7 @@ BASE_DIR = Path(__file__).resolve().parent
 # 配置模板目录
 TEMPLATE_DIR = BASE_DIR / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
-# # /templates：这是模板文件存放的目录，FastAPI会在这个目录下查找HTML模板文件。
-# 模拟数据库 - 实际应用中应替换为真实数据库
+
 
 # ========模板定义==============
 
@@ -66,10 +65,10 @@ class UserHabitInfo(BaseModel):
 
 class UserPsychology(BaseModel):
     # 修改
-    physical_reaction_index: str | None = None  # 数据库TINYINT ：躯体反应
+    physical_reaction_index: str | None = None  # 数据库str ：躯体反应
     sleep_cognition_bias: str | None = None  # 数据库str：睡眠认知偏差
-    exercise_stress_value: str | None = None  # 数据库TINYINT：运动压力值
-    emotion_stress_index: str | None = None  # 数据库TINYINT（整数）：情绪压力指标
+    exercise_stress_value: str | None = None  # 数据库str 运动压力值
+    emotion_stress_index: str | None = None  # 数据库str（整数）：情绪压力指标
 
 
 class User(BaseModel):
@@ -78,6 +77,61 @@ class User(BaseModel):
     user_habit_info: UserHabitInfo
     user_psychology: UserPsychology
 
+def user_get_username(user:User)->str:
+    return user.user_account_info.username
+
+def user_set_user(updated_user:User,target_user:User)->None:
+    # 1. 更新账户信息（仅更新非空字段）
+    if updated_user.user_account_info:
+        if updated_user.user_account_info.username is not None:
+            target_user.user_account_info.username = updated_user.user_account_info.username
+        if updated_user.user_account_info.password is not None:
+            target_user.user_account_info.password = updated_user.user_account_info.password  # 实际应用中应加密
+    
+    # 2. 更新基本信息
+    if updated_user.user_based_info:
+        if updated_user.user_based_info.real_name is not None:
+            target_user.user_based_info.real_name = updated_user.user_based_info.real_name
+        if updated_user.user_based_info.gender is not None:
+            target_user.user_based_info.gender = updated_user.user_based_info.gender
+        if updated_user.user_based_info.birthday is not None:
+            target_user.user_based_info.birthday = updated_user.user_based_info.birthday
+        if updated_user.user_based_info.height is not None:
+            target_user.user_based_info.height = updated_user.user_based_info.height
+        if updated_user.user_based_info.weight is not None:
+            target_user.user_based_info.weight = updated_user.user_based_info.weight
+    
+    # 3. 更新生活习惯信息
+    if updated_user.user_habit_info:
+        if updated_user.user_habit_info.daily_water is not None:
+            target_user.user_habit_info.daily_water = updated_user.user_habit_info.daily_water
+        if updated_user.user_habit_info.sleep_duration is not None:
+            target_user.user_habit_info.sleep_duration = updated_user.user_habit_info.sleep_duration
+        if updated_user.user_habit_info.exercise_amount is not None:
+            target_user.user_habit_info.exercise_amount = updated_user.user_habit_info.exercise_amount
+        if updated_user.user_habit_info.vegetable_fruit_intake is not None:
+            target_user.user_habit_info.vegetable_fruit_intake = updated_user.user_habit_info.vegetable_fruit_intake
+        if updated_user.user_habit_info.protein_intake is not None:
+            target_user.user_habit_info.protein_intake = updated_user.user_habit_info.protein_intake
+        if updated_user.user_habit_info.meat_vegetable_ratio is not None:
+            target_user.user_habit_info.meat_vegetable_ratio = updated_user.user_habit_info.meat_vegetable_ratio
+        if updated_user.user_habit_info.dietary_restrictions is not None:
+            target_user.user_habit_info.dietary_restrictions = updated_user.user_habit_info.dietary_restrictions
+        if updated_user.user_habit_info.cooking_method is not None:
+            target_user.user_habit_info.cooking_method = updated_user.user_habit_info.cooking_method
+    
+    # 4. 更新心理信息
+    if updated_user.user_psychology:
+        if updated_user.user_psychology.physical_reaction_index is not None:
+            target_user.user_psychology.physical_reaction_index = updated_user.user_psychology.physical_reaction_index
+        if updated_user.user_psychology.sleep_cognition_bias is not None:
+            target_user.user_psychology.sleep_cognition_bias = updated_user.user_psychology.sleep_cognition_bias
+        if updated_user.user_psychology.exercise_stress_value is not None:
+            target_user.user_psychology.exercise_stress_value = updated_user.user_psychology.exercise_stress_value
+        # if updated_user.user_psychology.diet_emotion_dependence is not None:
+        #     target_user.user_psychology.diet_emotion_dependence = updated_user.user_psychology.diet_emotion_dependence
+        if updated_user.user_psychology.emotion_stress_index is not None:
+            target_user.user_psychology.emotion_stress_index = updated_user.user_psychology.emotion_stress_index
 
 
 #=================心理模型==================
@@ -158,8 +212,9 @@ def get_user(user_info: dict)->Optional[User]:
     return User(user_account_info=user_account_info, user_based_info=user_based_info, user_habit_info=user_habit_info, user_psychology=user_psychology)
 
 
-# ======================心理==========
+# ======================心理测试==========
 
+# 内存中读取心理测试题目
 def load_psychology_assessment(json_path: str | Path) -> Dict[str, Any]:
     """
     加载心理测评JSON文件并转换为Python字典
@@ -225,7 +280,6 @@ def load_psychology_assessment(json_path: str | Path) -> Dict[str, Any]:
         raise
     
 
-# 内存中读取心理测试题目
 
 def assessment_data2BaseModels(assessment_data: Dict[str, Any]) -> PsychologyQuestions:
     """
@@ -327,18 +381,13 @@ def test_init():
 
 # ===============全局变量===================
 
-# 存储所有用户数据
-users_db: Dict[str, User] = {
-    "test_user_001":get_some_user()
 
-}
 
 # 存储session的当前登录用户
 active_users: Dict[str, str] = {}  # session_id: username
 
 # 对话历史
 chat_history: dict[str, List[Dict[str, str]]] = {}  # username: [message1, message2,...]
-
 
 """
 user: [sender, message, time]
@@ -396,10 +445,10 @@ def get_current_user(request: Request) -> Optional[User]:
     return None
 
 
-# 获取所有用户列表
-def get_all_users()->List[User]:
+# # 获取所有用户列表
+# def get_all_users()->List[User]:
 
-    return list(users_db.values())
+#     return list(users_db.values())
 
 
 # 创建一个新用户
@@ -416,6 +465,13 @@ def get_new_user(username: str, password: str)->User:
 
 
 # __________________数据库函数_______________________
+
+
+# 存储所有用户数据
+users_db: Dict[str, User] = {
+    "test_user_001":get_some_user()
+
+}
 
 def db_user_exists(username: str)->bool:
     """
@@ -443,6 +499,77 @@ def db_add_user(user: User)->None:
     
     users_db[user.user_account_info.username] = user
 
+def db_authenticate_user(username: str, password: str)->Optional[User]:
+    """
+    验证用户名和密码是否匹配,返回User对象或None
+    """
+    if db_user_exists(username=username):
+        user = db_get_user(username=username)
+        if user.user_account_info.password == password:
+            return user
+    
+    # 3. 验证失败返回None
+
+def db_update_user(updated_user: User)->None:
+    """
+    更新数据库中指定用户的信息
+    """
+    if not db_user_exists(user_get_username(updated_user)):
+        logging.warning(f"F(db_update_user):数据库中不存在用户名为{updated_user.user_account_info.username}的用户")
+        return
+    
+    #****** 数据库操作：更新，这是暂时的************
+    # 1. 更新用户名和密码
+    target_user = db_get_user(user_get_username(updated_user))
+    if updated_user.user_account_info:
+        if updated_user.user_account_info.username is not None:
+            target_user.user_account_info.username = updated_user.user_account_info.username
+        if updated_user.user_account_info.password is not None:
+            target_user.user_account_info.password = updated_user.user_account_info.password  # 实际应用中应加密
+    
+    # 2. 更新基本信息
+    if updated_user.user_based_info:
+        if updated_user.user_based_info.real_name is not None:
+            target_user.user_based_info.real_name = updated_user.user_based_info.real_name
+        if updated_user.user_based_info.gender is not None:
+            target_user.user_based_info.gender = updated_user.user_based_info.gender
+        if updated_user.user_based_info.birthday is not None:
+            target_user.user_based_info.birthday = updated_user.user_based_info.birthday
+        if updated_user.user_based_info.height is not None:
+            target_user.user_based_info.height = updated_user.user_based_info.height
+        if updated_user.user_based_info.weight is not None:
+            target_user.user_based_info.weight = updated_user.user_based_info.weight
+    
+    # 3. 更新生活习惯信息
+    if updated_user.user_habit_info:
+        if updated_user.user_habit_info.daily_water is not None:
+            target_user.user_habit_info.daily_water = updated_user.user_habit_info.daily_water
+        if updated_user.user_habit_info.sleep_duration is not None:
+            target_user.user_habit_info.sleep_duration = updated_user.user_habit_info.sleep_duration
+        if updated_user.user_habit_info.exercise_amount is not None:
+            target_user.user_habit_info.exercise_amount = updated_user.user_habit_info.exercise_amount
+        if updated_user.user_habit_info.vegetable_fruit_intake is not None:
+            target_user.user_habit_info.vegetable_fruit_intake = updated_user.user_habit_info.vegetable_fruit_intake
+        if updated_user.user_habit_info.protein_intake is not None:
+            target_user.user_habit_info.protein_intake = updated_user.user_habit_info.protein_intake
+        if updated_user.user_habit_info.meat_vegetable_ratio is not None:
+            target_user.user_habit_info.meat_vegetable_ratio = updated_user.user_habit_info.meat_vegetable_ratio
+        if updated_user.user_habit_info.dietary_restrictions is not None:
+            target_user.user_habit_info.dietary_restrictions = updated_user.user_habit_info.dietary_restrictions
+        if updated_user.user_habit_info.cooking_method is not None:
+            target_user.user_habit_info.cooking_method = updated_user.user_habit_info.cooking_method
+    
+    # 4. 更新心理信息
+    if updated_user.user_psychology:
+        if updated_user.user_psychology.physical_reaction_index is not None:
+            target_user.user_psychology.physical_reaction_index = updated_user.user_psychology.physical_reaction_index
+        if updated_user.user_psychology.sleep_cognition_bias is not None:
+            target_user.user_psychology.sleep_cognition_bias = updated_user.user_psychology.sleep_cognition_bias
+        if updated_user.user_psychology.exercise_stress_value is not None:
+            target_user.user_psychology.exercise_stress_value = updated_user.user_psychology.exercise_stress_value
+        if updated_user.user_psychology.emotion_stress_index is not None:
+            target_user.user_psychology.emotion_stress_index = updated_user.user_psychology.emotion_stress_index
+
 
 # ___________________注册/登录_________________________
 
@@ -451,8 +578,10 @@ def authenticate_user(username: str, password: str) -> Optional[User]:
     """
         验证用户名和密码是否匹配,返回User对象或None
     """
-    if db_user_exists(username=username):
-        return db_get_user(username=username)
+    if db_user_exists(username=username) and db_authenticate_user(username=username, password=password):
+            return db_get_user(username=username)
+        
+
     
     # 3. 验证失败返回None
     return None
@@ -529,7 +658,7 @@ def generate_text(
 
     # 构建带历史的提示词
     history_prompt = "\n".join([
-        f"{'用户' if msg['sender'] == 'user' else 'AI'}：{msg['message']}"
+        f"{'用户' if msg['sender'] == 'human' else 'AI'}：{msg['message']}"
         for msg in user_messages
     ])
     
@@ -630,7 +759,7 @@ def generate_text(
     return ai_answer, chat_history  # 返回AI回答和更新后的对话历史
 
 # ai意见
-def subjection(user_info: User) -> str:
+def subjection(user_info: User) -> list[str]:
     """根据用户信息生成健康建议"""
     API_BASE: str = "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation"
     API_KEY = os.getenv("DASHSCOPE_API_KEY")
@@ -766,8 +895,6 @@ async def home(request: Request, current_user: Optional[User] = Depends(get_curr
     
 
     print("已登录，显示主页")
-    # 获取所有用户列表（用于用户切换）
-    all_users = get_all_users()
     
     # 传递
     # 1. 当前用户信息
@@ -776,11 +903,9 @@ async def home(request: Request, current_user: Optional[User] = Depends(get_curr
     return templates.TemplateResponse("index.html", {
         "request": request,
         "current_user": current_user,
-        "all_users": all_users,
         "chat_history": chat_history,
         "test":test,
     })
-
 
 
 # 登录页面
@@ -837,12 +962,6 @@ async def login(
     )
     return response
 
-# 处理获取注册页面的请求
-@app.get("/get-register-page")
-async def get_register_page(request: Request):
-    # 这里可以添加一些必要的逻辑，如检查权限等
-    return {"status": "success"}  # 简单返回成功状态
-
 
 
 # 显示注册页面
@@ -872,28 +991,6 @@ async def logout(request: Request):
     return response
 
 
-# 切换用户
-@app.post("/switch-user")
-async def switch_user(
-    request: Request,
-    target_user: str = Form(...),
-    current_user: Optional[User] = Depends(get_current_user)
-):
-    if not current_user:
-        raise HTTPException(status_code=401, detail="未登录")
-    
-    if target_user not in users_db:
-        raise HTTPException(status_code=404, detail="用户不存在")
-    
-    # 更新当前会话的用户
-    session_id = request.cookies.get("session_id")
-    if session_id and session_id in active_users:  # 检查会话有效性
-        active_users[session_id] = target_user
-        return JSONResponse(content={"status": "success", "username": target_user})
-    else:
-        raise HTTPException(status_code=401, detail="会话已失效，请重新登录")
-
-
 # 添加新用户
 @app.post("/add-user")
 async def add_user(
@@ -915,7 +1012,12 @@ async def add_user(
 
     db_add_user(new_user)
     
-    return JSONResponse(content={"status": "success", "username": new_username})
+    return JSONResponse(
+        content={
+            "status": "success",
+            "username": new_username
+            }
+        )
 
 
 
@@ -1002,9 +1104,6 @@ async def handle_register(
             status_code=500
         )
 
-
-
-
 # 心理测试提交路由
 @app.post("/submit-test")
 async def submit_test(
@@ -1078,8 +1177,6 @@ async def submit_test(
         "results": results
     })
 
-
-
 # 更新用户信息路由
 @app.post("/update-user-info", response_class=JSONResponse)
 async def update_user_info(
@@ -1097,115 +1194,56 @@ async def update_user_info(
         raise HTTPException(status_code=401, detail="未登录，请先登录")
     
     # 获取当前用户的用户名（作为users_db的键）
-    current_username = current_user.user_account_info.username
+
+    current_username = user_get_username(current_user)
+
     if not current_username:
         print("当前用户信息不完整，返回400")
         raise HTTPException(status_code=400, detail="用户信息不完整")
     
     # 验证用户是否存在于数据库中
-    if current_username not in users_db:
+    if not db_user_exists(username=current_username):
         # 如果用户不存在，初始化一个新记录
-        users_db[current_username] = User(
-            user_account_info=UserAccountInfo(),
-            user_based_info=UserBasedInfo(),
-            user_habit_info=UserHabitInfo(),
-            user_psychology=UserPsychology()
+        db_add_user(
+            user=User(
+                user_account_info=UserAccountInfo(),
+                user_based_info=UserBasedInfo(),
+                user_habit_info=UserHabitInfo(),
+                user_psychology=UserPsychology()
+            )
         )
-    
-    # 更新用户信息（合并新数据，保留未修改的字段）
-    target_user = users_db[current_username]
-    
-    print(f"更新用户信息：{updated_user.model_dump()}")
 
-    # 1. 更新账户信息（仅更新非空字段）
-    if updated_user.user_account_info:
-        if updated_user.user_account_info.username is not None:
-            target_user.user_account_info.username = updated_user.user_account_info.username
-        if updated_user.user_account_info.password is not None:
-            target_user.user_account_info.password = updated_user.user_account_info.password  # 实际应用中应加密
-    
-    # 2. 更新基本信息
-    if updated_user.user_based_info:
-        if updated_user.user_based_info.real_name is not None:
-            target_user.user_based_info.real_name = updated_user.user_based_info.real_name
-        if updated_user.user_based_info.gender is not None:
-            target_user.user_based_info.gender = updated_user.user_based_info.gender
-        if updated_user.user_based_info.birthday is not None:
-            target_user.user_based_info.birthday = updated_user.user_based_info.birthday
-        if updated_user.user_based_info.height is not None:
-            target_user.user_based_info.height = updated_user.user_based_info.height
-        if updated_user.user_based_info.weight is not None:
-            target_user.user_based_info.weight = updated_user.user_based_info.weight
-    
-    # 3. 更新生活习惯信息
-    if updated_user.user_habit_info:
-        if updated_user.user_habit_info.daily_water is not None:
-            target_user.user_habit_info.daily_water = updated_user.user_habit_info.daily_water
-        if updated_user.user_habit_info.sleep_duration is not None:
-            target_user.user_habit_info.sleep_duration = updated_user.user_habit_info.sleep_duration
-        if updated_user.user_habit_info.exercise_amount is not None:
-            target_user.user_habit_info.exercise_amount = updated_user.user_habit_info.exercise_amount
-        if updated_user.user_habit_info.vegetable_fruit_intake is not None:
-            target_user.user_habit_info.vegetable_fruit_intake = updated_user.user_habit_info.vegetable_fruit_intake
-        if updated_user.user_habit_info.protein_intake is not None:
-            target_user.user_habit_info.protein_intake = updated_user.user_habit_info.protein_intake
-        if updated_user.user_habit_info.meat_vegetable_ratio is not None:
-            target_user.user_habit_info.meat_vegetable_ratio = updated_user.user_habit_info.meat_vegetable_ratio
-        if updated_user.user_habit_info.dietary_restrictions is not None:
-            target_user.user_habit_info.dietary_restrictions = updated_user.user_habit_info.dietary_restrictions
-        if updated_user.user_habit_info.cooking_method is not None:
-            target_user.user_habit_info.cooking_method = updated_user.user_habit_info.cooking_method
-    
-    # 4. 更新心理信息
-    if updated_user.user_psychology:
-        if updated_user.user_psychology.physical_reaction_index is not None:
-            target_user.user_psychology.physical_reaction_index = updated_user.user_psychology.physical_reaction_index
-        if updated_user.user_psychology.sleep_cognition_bias is not None:
-            target_user.user_psychology.sleep_cognition_bias = updated_user.user_psychology.sleep_cognition_bias
-        if updated_user.user_psychology.exercise_stress_value is not None:
-            target_user.user_psychology.exercise_stress_value = updated_user.user_psychology.exercise_stress_value
-        # if updated_user.user_psychology.diet_emotion_dependence is not None:
-        #     target_user.user_psychology.diet_emotion_dependence = updated_user.user_psychology.diet_emotion_dependence
-        if updated_user.user_psychology.emotion_stress_index is not None:
-            target_user.user_psychology.emotion_stress_index = updated_user.user_psychology.emotion_stress_index
-    
-    # 更新当前用户对象（内存中）
-    current_user = target_user
-    
-    print(current_user.model_dump())
+    db_update_user(updated_user)
 
-    # 返回更新后的用户信息（排除密码等敏感字段）
-    return {
-        "status": "success",
-        "message": "用户信息更新成功",
-        "user_info": {
-            "user_account_info": {
-                "username": target_user.user_account_info.username  # 不返回密码
-            },
-            "user_based_info": target_user.user_based_info.model_dump(),
-            "user_habit_info": target_user.user_habit_info.model_dump(),
-            "user_psychology": target_user.user_psychology.model_dump()
+
+
+    return JSONResponse(
+        content={
+            "status": "success",
+            "message": "用户信息更新成功",
+            "user_info":  updated_user.model_dump()
         }
-    }
+    )
 
 # 生成管家意见
 @app.post("/generate-advice")
-async def generate_advice(request: Request):
+async def generate_advice(
+    request: Request,
+    current_user: Optional[User] = Depends(get_current_user)
+    ):
     try:
-        # {'user_name': 'test_user_001', 'request_time': '2025-07-16T07:44:10.028Z'}
-        request = await request.json()
-        # if(request['user_name'] not in users_db):
-        #     return JSONResponse(content={"status": "error", "message": "用户不存在"})
-        # user = users_db[request['user_name']]
-        # advice_list = []
-        print(current_user)
+
+        logging.info(f"开始生成管家意见")
+
         advices=subjection(current_user)
-        # result = re.findall(r'@([^&]+)&',advice)
-        response = JSONResponse(content={"status": "success", "advices": advices})
 
-        print(advices)
+        
 
-        return response
+        logging.info(f"生成管家意见成功：{advices}")
+
+        response = JSONResponse(
+            content={"status": "success", "advices": advices}
+        )
     
     except Exception as e:
         print(e)
