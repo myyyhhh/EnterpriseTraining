@@ -1,7 +1,7 @@
 
 // 获取DOM元素
 const body = document.body;
-// const userInfo = document.getElementById('userInfo');
+const userInfo = document.getElementById('userInfo');
 // const userSwitchMenu = document.getElementById('userSwitchMenu');
 const logoutBtn = document.getElementById('logoutBtn');
 const addUserBtn = document.getElementById('addUserBtn');
@@ -17,14 +17,17 @@ const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 const addUserForm = document.getElementById('addUserForm');
 
 
-
+    userInfo.addEventListener('click', function(e) {
+        e.stopPropagation();
+        userSwitchMenu.classList.toggle('active');
+    });
 document.addEventListener('click', function () {
     userSwitchMenu.classList.remove('active');
 });
 
-userSwitchMenu.addEventListener('click', function (e) {
-    e.stopPropagation();
-});
+// userSwitchMenu.addEventListener('click', function (e) {
+//     e.stopPropagation();
+// });
 
 // 打开退出登录确认对话框
 logoutBtn.addEventListener('click', function () {
@@ -33,12 +36,12 @@ logoutBtn.addEventListener('click', function () {
     body.classList.add('modal-active');
 });
 
-// 打开添加用户对话框
-addUserBtn.addEventListener('click', function () {
-    addUserModal.style.display = 'block';
-    addUserModalBackdrop.style.display = 'block';
-    body.classList.add('modal-active');
-});
+// // 打开添加用户对话框
+// addUserBtn.addEventListener('click', function () {
+//     addUserModal.style.display = 'block';
+//     addUserModalBackdrop.style.display = 'block';
+//     body.classList.add('modal-active');
+// });
 
 // 关闭退出登录对话框
 function closeLogoutModal() {
@@ -47,34 +50,34 @@ function closeLogoutModal() {
     body.classList.remove('modal-active');
 }
 
-// 关闭添加用户对话框
-function closeAddUserModal() {
-    addUserModal.style.display = 'none';
-    addUserModalBackdrop.style.display = 'none';
-    body.classList.remove('modal-active');
-}
+// // 关闭添加用户对话框
+// function closeAddUserModal() {
+//     addUserModal.style.display = 'none';
+//     addUserModalBackdrop.style.display = 'none';
+//     body.classList.remove('modal-active');
+// }
 
 // 事件监听
 closeLogoutModalBtn.addEventListener('click', closeLogoutModal);
 cancelLogoutBtn.addEventListener('click', closeLogoutModal);
 logoutModalBackdrop.addEventListener('click', closeLogoutModal);
 
-closeAddUserModalBtn.addEventListener('click', closeAddUserModal);
-cancelAddUserBtn.addEventListener('click', closeAddUserModal);
-addUserModalBackdrop.addEventListener('click', closeAddUserModal);
+// closeAddUserModalBtn.addEventListener('click', closeAddUserModal);
+// cancelAddUserBtn.addEventListener('click', closeAddUserModal);
+// addUserModalBackdrop.addEventListener('click', closeAddUserModal);
 
 // 阻止点击模态框内容时关闭
 logoutModal.addEventListener('click', function (e) {
     e.stopPropagation();
 });
 
-addUserModal.addEventListener('click', function (e) {
-    e.stopPropagation();
-});
+// addUserModal.addEventListener('click', function (e) {
+//     e.stopPropagation();
+// });
 
 // 退出登录确认
 confirmLogoutBtn.addEventListener('click', function () {
-
+    console.log('logout success');
     logout();
 
     closeLogoutModal();

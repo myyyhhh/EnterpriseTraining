@@ -25,6 +25,30 @@
         .error-message i {
             font-size: 18px;
         }
+
+        /* 注册按钮样式，与登录按钮保持一致风格 */
+        .btn-register {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #4CAF50; /* 绿色，与登录按钮区分 */
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-register:hover {
+            background-color: #45a049;
+        }
+
+        /* 加载状态样式 */
+        .btn-register.loading {
+            background-color: #81C784;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -50,64 +74,107 @@
             </div>
             <button type="submit" class="btn btn-login">登录</button>
         </form>
+        <!-- 新增注册按钮 -->
+        <button type="button" class="btn-register" onclick="goToRegistration()">注册账号</button>
     </div>
 
     <script>
-        // 1. 选择登录表单并添加提交事件监听器
+        // 跳转到注册页面的函数，向后端发送请求
+        function goToRegistration() {
+            // 获取注册按钮并设置加载状态
+            const registerBtn = document.querySelector('.btn-register');
+            const originalText = registerBtn.textContent;
+            registerBtn.disabled = true;
+            registerBtn.classList.add('loading');
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 加载中...';
+
+            // 发送请求到后端获取注册页面
+            fetch('/get-register-page', {
+                method: 'GET',
+                credentials: 'include' // 包含cookie，保持会话
+            })
+            .then(response => {
+                if (response.ok) {
+                    // 如果响应成功，直接跳转到注册页面路由
+                    window.location.href = '/register';
+                } else {
+                    throw new Error('获取注册页面失败');
+                }
+            })
+            .catch(error => {
+                console.error('跳转注册页面错误:', error);
+                // 恢复按钮状态
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.textContent = originalText;
+                
+                // 显示错误消息
+                showError('无法加载注册页面，请稍后重试');
+            });
+        }
+
+        // 显示错误消息的函数
+        function showError(message) {
+            // 检查是否已有错误消息元素
+            let errorElement = document.querySelector('.error-message');
+            
+            if (errorElement) {
+                // 更新现有错误消息
+                errorElement.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+                errorElement.style.display = 'flex';
+            } else {
+                // 创建新的错误消息元素
+                const newErrorElement = document.createElement('div');
+                newErrorElement.className = 'error-message';
+                newErrorElement.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+                
+                // 插入到登录表单上方
+                const loginForm = document.querySelector('.login-form');
+                loginForm.parentNode.insertBefore(newErrorElement, loginForm);
+            }
+            
+            // 3秒后自动隐藏错误消息
+            setTimeout(() => {
+                const errorEl = document.querySelector('.error-message');
+                if (errorEl) errorEl.style.display = 'none';
+            }, 3000);
+        }
+
+        // 登录表单提交处理（保持原有功能）
         document.querySelector('.login-form').addEventListener('submit', async function (e) {
-            // 阻止表单的默认提交行为（页面刷新）
             e.preventDefault();
 
-            // 2. 获取表单元素和表单数据
-            const form = e.target; // 当前提交的表单元素
-            const formData = new FormData(form); // 创建FormData对象收集表单数据
+            const form = e.target;
+            const formData = new FormData(form);
 
             try {
-                // 3. 使用Fetch API发送异步POST请求
                 const response = await fetch(form.action, {
                     method: 'POST',
-                    body: new URLSearchParams(formData) // 将表单数据转换为URL编码格式
+                    body: new URLSearchParams(formData)
                 });
 
-                // 4. 检查响应是否为重定向（登录成功）
                 if (response.redirected) {
-                    // 重定向表示登录成功，跳转到目标页面
                     window.location.href = response.url;
                 } else {
-                    // 5. 处理非重定向响应（登录失败）
-                    // 获取HTML响应内容
                     const html = await response.text();
-
-                    // 创建临时容器解析HTML
                     const tempContainer = document.createElement('div');
                     tempContainer.innerHTML = html;
-
-                    // 获取新的登录表单容器
                     const newLoginContainer = tempContainer.querySelector('#loginContainer');
 
                     if (newLoginContainer) {
-                        // 6. 更新页面内容
-                        // 替换现有登录容器内容
                         document.getElementById('loginContainer').innerHTML = newLoginContainer.innerHTML;
-
-                        // 7. 重新绑定事件处理程序
                         document.querySelector('.login-form').addEventListener('submit', arguments.callee);
                     }
                 }
             } catch (error) {
-                // 8. 处理网络错误
                 const errorElement = document.querySelector('.error-message');
                 if (errorElement) {
-                    // 如果已有错误元素，更新其内容
                     errorElement.textContent = '请求失败: ' + error.message;
                     errorElement.style.display = 'block';
                 } else {
-                    // 9. 创建新的错误消息元素
                     const newErrorElement = document.createElement('div');
                     newErrorElement.className = 'error-message';
                     newErrorElement.textContent = '请求失败: ' + error.message;
-
-                    // 插入到表单顶部
                     const form = document.querySelector('.login-form');
                     form.insertBefore(newErrorElement, form.firstChild);
                 }

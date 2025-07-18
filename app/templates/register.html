@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能助手 - 用户注册</title>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F7FA;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            color: #1D2129;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 28rem;
+            width: 100%;
+        }
+        
+        /* 渐变背景 */
+        .gradient-bg {
+            background: linear-gradient(135deg, #165DFF 0%, #36BFFA 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .gradient-bg h1 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 700;
+        }
+        
+        .gradient-bg p {
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+        
+        /* 表单样式 */
+        .form-container {
+            padding: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4E5969;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            position: relative;
+        }
+        
+        .form-input input {
+            width: 100%;
+            padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+            border: 1px solid #E5E6EB;
+            border-radius: 0.5rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .form-input input:focus {
+            border-color: #165DFF;
+            box-shadow: 0 0 0 4px rgba(22, 93, 255, 0.1);
+        }
+        
+        .form-input .icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #86909C;
+        }
+        
+        .form-input .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #86909C;
+            cursor: pointer;
+        }
+        
+        .form-input .toggle-password:hover {
+            color: #4E5969;
+        }
+        
+        .password-hint {
+            font-size: 0.75rem;
+            color: #86909C;
+            margin-top: 0.25rem;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .checkbox-group input {
+            margin-top: 0.125rem;
+        }
+        
+        .checkbox-group label {
+            margin-left: 0.75rem;
+            font-size: 0.875rem;
+            color: #4E5969;
+        }
+        
+        .checkbox-group label a {
+            color: #165DFF;
+            text-decoration: none;
+        }
+        
+        .checkbox-group label a:hover {
+            text-decoration: underline;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            background-color: #165DFF;
+            color: white;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0E4FE9;
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .login-link {
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: #4E5969;
+        }
+        
+        .login-link a {
+            color: #165DFF;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #86909C;
+        }
+        
+        /* 错误消息样式 */
+        .error-message {
+            display: none;
+            background-color: rgba(245, 63, 63, 0.1);
+            color: #F53F3F;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.25rem;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .error-message.visible {
+            display: flex;
+        }
+        
+        .animate-pulse {
+            animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        /* 成功消息样式 */
+        .success-message {
+            display: none;
+            background-color: rgba(0, 180, 42, 0.1);
+            color: #00B42A;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.25rem;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .success-message.visible {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <div class="w-full max-w-md">
+        <!-- 注册卡片 -->
+        <div class="card">
+            <!-- 顶部渐变区域 -->
+            <div class="gradient-bg">
+                <h1>创建账户</h1>
+                <p class="mt-2">填写以下信息注册新账号</p>
+            </div>
+            
+            <!-- 注册表单 -->
+            <form id="registrationForm" class="form-container" method="POST" action="/register">
+                <!-- 错误消息显示区域 -->
+                <div id="errorMessage" class="error-message">
+                    <i class="fa fa-exclamation-circle"></i>
+                    <span id="errorText"></span>
+                </div>
+                
+                <!-- 成功消息显示区域 -->
+                <div id="successMessage" class="success-message">
+                    <i class="fa fa-check-circle"></i>
+                    <span id="successText"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username" class="form-label">用户名</label>
+                    <div class="form-input">
+                        <span class="icon">
+                            <i class="fa fa-user"></i>
+                        </span>
+                        <input type="text" id="username" name="username" placeholder="请输入用户名" required>
+                    </div>
+                </div>
+                
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">密码</label>
+                    <div class="form-input">
+                        <span class="icon">
+                            <i class="fa fa-lock"></i>
+                        </span>
+                        <input type="password" id="password" name="password" placeholder="请输入密码" required>
+                        <button type="button" id="togglePassword" class="toggle-password">
+                            <i class="fa fa-eye-slash"></i>
+                        </button>
+                    </div>
+                    <p class="password-hint">密码长度至少8位，包含字母和数字</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword" class="form-label">确认密码</label>
+                    <div class="form-input">
+                        <span class="icon">
+                            <i class="fa fa-lock"></i>
+                        </span>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="请再次输入密码" required>
+                        <button type="button" id="toggleConfirmPassword" class="toggle-password">
+                            <i class="fa fa-eye-slash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input id="terms" name="terms" type="checkbox" required>
+                    <label for="terms">我已阅读并同意<a href="#" class="text-primary hover:underline">服务条款</a>和<a href="#" class="text-primary hover:underline">隐私政策</a></label>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    <span>立即注册</span>
+                    <i class="fa fa-arrow-right"></i>
+                </button>
+                
+                <p class="text-center login-link">
+                    已有账号？ <a href="/login">立即登录</a>
+                </p>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        // 密码显示/隐藏功能
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
+        
+        togglePassword.addEventListener('click', function () {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+        
+        toggleConfirmPassword.addEventListener('click', function () {
+            const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPassword.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+        
+        // 表单提交处理
+        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            // 简单前端验证
+            const username = formData.get('username');
+            const email = formData.get('email');
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+            
+            // 验证用户名
+            if (!username) {
+                showError('请输入用户名');
+                return;
+            }
+            
+            // 验证密码
+            if (password.length < 8) {
+                showError('密码长度至少为8位');
+                return;
+            }
+            
+            if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
+                showError('密码必须包含字母和数字');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('两次输入的密码不一致');
+                return;
+            }
+            
+            // 显示加载状态
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 注册中...';
+            
+            console.log('Registration form data:', );
+
+            try {
+                // 发送注册请求
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        'username': username,
+                        // 'email': email,
+                        'password': password
+                    })
+                });
+                
+                console.log('Registration response:', response);
+                
+                // 重置按钮状态
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+                
+                if (response.ok) {
+                    // 注册成功
+                    const data = await response.json();
+                    showSuccess(data.message || '注册成功！即将跳转到登录页面...');
+                    
+                    // 3秒后跳转到登录页面
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 3000);
+                } else {
+                    // 注册失败
+                    const errorData = await response.json();
+                    showError(errorData.message || '注册失败，请重试');
+                }
+            } catch (error) {
+                // 网络错误
+                console.error('Registration error:', error);
+                showError('网络错误，请稍后再试');
+                
+                // 重置按钮状态
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            }
+        });
+        
+        // 显示错误消息
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            const successMessage = document.getElementById('successMessage');
+            
+            // 隐藏成功消息
+            successMessage.classList.remove('visible');
+            
+            // 显示错误消息
+            errorText.textContent = message;
+            errorMessage.classList.add('visible');
+            errorMessage.classList.add('animate-pulse');
+            
+            setTimeout(() => {
+                errorMessage.classList.remove('animate-pulse');
+            }, 1000);
+            
+            // 5秒后自动隐藏错误消息
+            setTimeout(() => {
+                errorMessage.classList.remove('visible');
+            }, 5000);
+        }
+        
+        // 显示成功消息
+        function showSuccess(message) {
+            const successMessage = document.getElementById('successMessage');
+            const successText = document.getElementById('successText');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // 隐藏错误消息
+            errorMessage.classList.remove('visible');
+            
+            // 显示成功消息
+            successText.textContent = message;
+            successMessage.classList.add('visible');
+            successMessage.classList.add('animate-pulse');
+            
+            setTimeout(() => {
+                successMessage.classList.remove('animate-pulse');
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
+    

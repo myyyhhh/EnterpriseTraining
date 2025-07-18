@@ -428,7 +428,6 @@ def get_new_user(username: str, password: str)->User:
     )
 
 
-
 # __________________数据库函数_______________________
 
 def db_user_exists(username: str)->bool:
@@ -850,6 +849,19 @@ async def login(
     )
     return response
 
+# 处理获取注册页面的请求
+@app.get("/get-register-page")
+async def get_register_page(request: Request):
+    # 这里可以添加一些必要的逻辑，如检查权限等
+    return {"status": "success"}  # 简单返回成功状态
+
+
+
+# 显示注册页面
+@app.get("/register")
+async def show_register_page(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
+
 
 # 退出登录
 @app.post("/logout")  # 改为POST方法
@@ -918,30 +930,30 @@ async def add_user(
     return JSONResponse(content={"status": "success", "username": new_username})
 
 
-# 导航页面路由
-@app.get("/{view_name}", response_class=HTMLResponse)
-async def get_view(
-    request: Request,
-    view_name: str,
-    current_user: Optional[User] = Depends(get_current_user)
-):
-    if not current_user:
-        return RedirectResponse(url="/login", status_code=303)
+# # 导航页面路由
+# @app.get("/{view_name}", response_class=HTMLResponse)
+# async def get_view(
+#     request: Request,
+#     view_name: str,
+#     current_user: Optional[User] = Depends(get_current_user)
+# ):
+#     if not current_user:
+#         return RedirectResponse(url="/login", status_code=303)
     
-    valid_views = ["home", "chat", "test", "profile", "advice"]
+#     valid_views = ["home", "chat", "test", "profile", "advice"]
     
-    if view_name not in valid_views:
-        raise HTTPException(status_code=404, detail="页面不存在")
+#     if view_name not in valid_views:
+#         raise HTTPException(status_code=404, detail="页面不存在")
     
-    # 获取所有用户列表
-    all_users = list(users_db.values())
+#     # 获取所有用户列表
+#     all_users = list(users_db.values())
     
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "current_user": current_user,
-        "all_users": all_users,
-        "active_view": view_name
-    })
+#     return templates.TemplateResponse("index.html", {
+#         "request": request,
+#         "current_user": current_user,
+#         "all_users": all_users,
+#         "active_view": view_name
+#     })
 
 # 聊天消息发送
 @app.post("/send-message")
@@ -982,13 +994,57 @@ async def send_message(
         print(e,"错误输出")
         raise HTTPException(status_code=500, detail=f"处理消息失败：{str(e)}")
 
-# 获取用户列表
-@app.get("/api/users", response_class=JSONResponse)
-async def get_users(current_user: Optional[User] = Depends(get_current_user)):
-    if not current_user:
-        raise HTTPException(status_code=401, detail="未登录")
+
+# 注册处理 - 接收前端POST请求
+@app.post("/register", response_class=JSONResponse)
+async def handle_register(
+    username: str = Form(...),
+    password: str = Form(...)
+):
+    """
+    处理用户注册请求
+    - 接收前端传来的username和password
+    - 验证用户是否已存在
+    - 创建新用户并保存到数据库
+    """
+    try:
+        # 检查用户名是否已存在
+        if db_user_exists(username):
+            return JSONResponse(
+                content={"status": "error", "message": "用户名已存在"},
+                status_code=400
+            )
+        
+        # 创建新用户
+        new_user = get_new_user(username=username, password=password)
+        
+        # 保存到数据库
+        db_add_user(new_user)
+        
+        # 注册成功，返回成功响应
+        return JSONResponse(
+            content={
+                "status": "success",
+                "message": f"用户 {username} 注册成功",
+                "username": username
+            }
+        )
     
-    return [user.dict() for user in users_db.values()]
+    except Exception as e:
+        # 处理异常情况
+        logging.error(f"注册处理错误: {str(e)}")
+        return JSONResponse(
+            content={"status": "error", "message": "注册失败，请稍后重试"},
+            status_code=500
+        )
+
+# # 获取用户列表
+# @app.get("/api/users", response_class=JSONResponse)
+# async def get_users(current_user: Optional[User] = Depends(get_current_user)):
+#     if not current_user:
+#         raise HTTPException(status_code=401, detail="未登录")
+    
+#     return [user.dict() for user in users_db.values()]
 
 # 心理测试提交路由
 @app.post("/submit-test")
