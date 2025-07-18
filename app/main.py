@@ -1,24 +1,19 @@
-
-# 确保导入所有必要的模块
+# 导入
 from datetime import date, datetime
 import json
 import logging
 import os
 import re
 import uuid
+import secrets
+from pathlib import Path
+from typing import Any, Dict, List, Literal, Optional, Tuple
 import requests
 from fastapi import FastAPI, Request, Form, Depends, HTTPException
-
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pathlib import Path
-import secrets
-from typing import Any, Dict, List, Literal, Optional
-import json
-import logging
-from pathlib import Path
-from typing import Dict, Any
+from pydantic import BaseModel
 
 
 app = FastAPI()
@@ -29,11 +24,6 @@ STATIC_DIR = os.path.join(BASE_DIR,"static")
 # print(STATIC_DIR)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
-# app.mount("/static", StaticFiles(directory="app/static"), name="static")
-
-# # /static：这是URL路径前缀，表示所有以/static开头的请求都会被交给StaticFiles处理。
-# # StaticFiles(directory="static")：指定静态文件存放的目录为static。也就是说，static文件夹中的所有文件都可以通过/static路径来访问。
-# # name="static"：为挂载的静态文件设置一个名称，可以方便地引用。
 
 
 
@@ -50,11 +40,6 @@ templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 # ========模板定义==============
 
 from pydantic import BaseModel
-
-# class User(BaseModel):
-#     username: str
-#     password: str
-
 
 
 class UserAccountInfo(BaseModel):
@@ -325,8 +310,6 @@ def get_some_chatHistory()->dict:
         ]
     }
 
-
-
 def test_init():
     # 全局变量初始化/generate-advice
     global users_db, active_users, chat_history,current_user
@@ -334,8 +317,6 @@ def test_init():
 
     current_user = get_some_user()
     chat_history = get_some_chatHistory()
-
-
 
 
 # ===============全局变量===================
@@ -459,7 +440,7 @@ def db_add_user(user: User)->None:
 
 # ___________________注册/登录_________________________
 
-# 登录验证
+# 登录验证:未完成
 def authenticate_user(username: str, password: str) -> Optional[User]:
     """
         验证用户名和密码是否匹配,返回User对象或None
@@ -763,7 +744,7 @@ def build_prompt(user_info: User) -> str:
 
 # /===========================================================
 # =================路由定义====================================
-# ====
+# ===========================================================/
 
 
 
@@ -822,6 +803,7 @@ async def login(
     print(username, password,"尝试登录")
 
     user = authenticate_user(username, password)
+
     if not user:
         print("登录失败，返回错误页面")
         # 打印传递给模板的参数
@@ -930,30 +912,6 @@ async def add_user(
     return JSONResponse(content={"status": "success", "username": new_username})
 
 
-# # 导航页面路由
-# @app.get("/{view_name}", response_class=HTMLResponse)
-# async def get_view(
-#     request: Request,
-#     view_name: str,
-#     current_user: Optional[User] = Depends(get_current_user)
-# ):
-#     if not current_user:
-#         return RedirectResponse(url="/login", status_code=303)
-    
-#     valid_views = ["home", "chat", "test", "profile", "advice"]
-    
-#     if view_name not in valid_views:
-#         raise HTTPException(status_code=404, detail="页面不存在")
-    
-#     # 获取所有用户列表
-#     all_users = list(users_db.values())
-    
-#     return templates.TemplateResponse("index.html", {
-#         "request": request,
-#         "current_user": current_user,
-#         "all_users": all_users,
-#         "active_view": view_name
-#     })
 
 # 聊天消息发送
 @app.post("/send-message")
@@ -1038,13 +996,8 @@ async def handle_register(
             status_code=500
         )
 
-# # 获取用户列表
-# @app.get("/api/users", response_class=JSONResponse)
-# async def get_users(current_user: Optional[User] = Depends(get_current_user)):
-#     if not current_user:
-#         raise HTTPException(status_code=401, detail="未登录")
-    
-#     return [user.dict() for user in users_db.values()]
+
+
 
 # 心理测试提交路由
 @app.post("/submit-test")
@@ -1052,8 +1005,6 @@ async def submit_test(
     request: Request,
     current_user: Optional[User] = Depends(get_current_user)
 ):
-    print("in test submit======================")
-
     global test
 
     if not current_user:
@@ -1070,7 +1021,8 @@ async def submit_test(
             content={"status": "error", "message": "未提交任何答案"},
             status_code=400
         )
-    # ----------------------------------------------------------------
+
+
     cleaned_answers = {}
     for key, value in answers.items():
         cleaned_key = key.replace(" ", "").replace("　", "")
@@ -1113,6 +1065,8 @@ async def submit_test(
         "status": "success",
         "results": results
     })
+
+
 
 # 更新用户信息路由
 @app.post("/update-user-info", response_class=JSONResponse)
@@ -1245,5 +1199,3 @@ async def generate_advice(request: Request):
         print(e)
         return JSONResponse(content={"status": "error", "message": "系统错误"})
     
-
-

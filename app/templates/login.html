@@ -33,7 +33,8 @@
             margin-top: 10px;
             border: none;
             border-radius: 4px;
-            background-color: #4CAF50; /* 绿色，与登录按钮区分 */
+            background-color: #4CAF50;
+            /* 绿色，与登录按钮区分 */
             color: white;
             font-size: 16px;
             cursor: pointer;
@@ -75,7 +76,10 @@
             <button type="submit" class="btn btn-login">登录</button>
         </form>
         <!-- 新增注册按钮 -->
-        <button type="button" class="btn-register" onclick="goToRegistration()">注册账号</button>
+        <!-- <button type="button" class="btn-register" onclick="goToRegistration()">注册账号</button> -->
+        <p class="text-center register-link">
+            还没有账号？ <a href="/register" class="btn-register">注册账号</a>
+        </p>
     </div>
 
     <script>
@@ -93,31 +97,31 @@
                 method: 'GET',
                 credentials: 'include' // 包含cookie，保持会话
             })
-            .then(response => {
-                if (response.ok) {
-                    // 如果响应成功，直接跳转到注册页面路由
-                    window.location.href = '/register';
-                } else {
-                    throw new Error('获取注册页面失败');
-                }
-            })
-            .catch(error => {
-                console.error('跳转注册页面错误:', error);
-                // 恢复按钮状态
-                registerBtn.disabled = false;
-                registerBtn.classList.remove('loading');
-                registerBtn.textContent = originalText;
-                
-                // 显示错误消息
-                showError('无法加载注册页面，请稍后重试');
-            });
+                .then(response => {
+                    if (response.ok) {
+                        // 如果响应成功，直接跳转到注册页面路由
+                        window.location.href = '/register';
+                    } else {
+                        throw new Error('获取注册页面失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('跳转注册页面错误:', error);
+                    // 恢复按钮状态
+                    registerBtn.disabled = false;
+                    registerBtn.classList.remove('loading');
+                    registerBtn.textContent = originalText;
+
+                    // 显示错误消息
+                    showError('无法加载注册页面，请稍后重试');
+                });
         }
 
         // 显示错误消息的函数
         function showError(message) {
             // 检查是否已有错误消息元素
             let errorElement = document.querySelector('.error-message');
-            
+
             if (errorElement) {
                 // 更新现有错误消息
                 errorElement.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
@@ -127,12 +131,12 @@
                 const newErrorElement = document.createElement('div');
                 newErrorElement.className = 'error-message';
                 newErrorElement.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
-                
+
                 // 插入到登录表单上方
                 const loginForm = document.querySelector('.login-form');
                 loginForm.parentNode.insertBefore(newErrorElement, loginForm);
             }
-            
+
             // 3秒后自动隐藏错误消息
             setTimeout(() => {
                 const errorEl = document.querySelector('.error-message');
